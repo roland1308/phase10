@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:phase_10_points/views/3_up_layouts/three_up_layout_1.dart';
-import 'package:phase_10_points/views/3_up_layouts/three_up_layout_2.dart';
-import 'package:phase_10_points/views/4_up_layout/four_up_layout_1.dart';
-import 'package:phase_10_points/views/4_up_layout/four_up_layout_2.dart';
-import 'package:phase_10_points/views/5_up_layout/five_up_layout_1.dart';
+import 'package:phase_10_points/views/5_up_layouts/five_up_layout_2.dart';
+import 'package:phase_10_points/views/6_up_layouts/six_up_layout_2.dart';
 
 import 'controllers/points_controller.dart';
 
@@ -41,7 +38,10 @@ class MyApp extends StatelessWidget {
             return Stack(
               alignment: AlignmentDirectional.center,
               children: [
-                const FiveUpLayout1(),
+                //const SixUpLayout1(),
+                const SixUpLayout2(),
+                //const FiveUpLayout1(),
+                //const FiveUpLayout2(),
                 //const FourUpLayout1(),
                 //const FourUpLayout2(),
                 //const ThreeUpLayout1(),

@@ -95,7 +95,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     child: FittedBox(
                       child: Text(
                         points.toString(),
-                        style: TextStyle(color: widget.color, fontSize: 150),
+                        style: TextStyle(color: widget.color, fontSize: 80),
                       ),
                     ),
                   ),
@@ -132,22 +132,22 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             onTap: () => changePhase(-1),
             child: Text(
               "-  ",
-              style: TextStyle(color: widget.color, fontSize: 35),
+              style: TextStyle(color: widget.color, fontSize: 25),
             ),
           ),
           Text(
             "Phase:  ",
-            style: TextStyle(color: widget.color, fontSize: 30),
+            style: TextStyle(color: widget.color, fontSize: 20),
           ),
           Text(
-            ((phase / 100).toStringAsFixed(2)).substring(2),
-            style: TextStyle(color: widget.color, fontSize: 30),
+            ((phase / 80).toStringAsFixed(2)).substring(2),
+            style: TextStyle(color: widget.color, fontSize: 20),
           ),
           GestureDetector(
             onTap: () => changePhase(1),
             child: Text(
               "  +",
-              style: TextStyle(color: widget.color, fontSize: 35),
+              style: TextStyle(color: widget.color, fontSize: 25),
             ),
           ),
         ],
