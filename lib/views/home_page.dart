@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:phase_10_points/utils/constants.dart';
 import 'package:phase_10_points/views/2_up_layouts/two_up_layout_1.dart';
+import 'package:phase_10_points/views/view_layout.dart';
 
 import '2_up_layouts/two_up_layout_2.dart';
 
@@ -42,17 +43,18 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Text(
                   'Número de jugadores: $players',
-                  style: TextStyle(color: kColor1),
+                  style: const TextStyle(color: kColor1),
                 ),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: buildSchemas(kLayouts[players.toInt() - 2]),
+              children: buildSchemas(kLayouts[players.toInt() - 2].assetImages),
             ),
             ElevatedButton(
                 onPressed: () {
-                  Get.to(TwoUpLayout1());
+                  Get.to(ViewLayout(players.toInt()-2, selectedLayout-1));
+                  //Get.to(kLayouts[players.toInt() - 2].layoutWidgets[selectedLayout-1]);
                 },
                 child: const Text("INICIO"))
           ],

@@ -11,25 +11,23 @@ class TwoUpLayout1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-              child: RotatedBox(
-                  quarterTurns: 1,
-                  child: PlayerWidget(
-                      color: kColor1,
-                      maxWidth: MediaQuery.of(context).size.height / 2))),
-          const PlayersDivider(),
-          Expanded(
-              child: RotatedBox(
-                  quarterTurns: -1,
-                  child: PlayerWidget(
-                      color: kColor2,
-                      maxWidth: MediaQuery.of(context).size.height / 2))),
-        ],
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+            child: RotatedBox(
+                quarterTurns: 1,
+                child: PlayerWidget(
+                    color: kColor1,
+                    maxWidth: MediaQuery.of(context).size.height / 2))),
+        const PlayersDivider(),
+        Expanded(
+            child: RotatedBox(
+                quarterTurns: -1,
+                child: PlayerWidget(
+                    color: kColor2,
+                    maxWidth: MediaQuery.of(context).size.height / 2))),
+      ],
     );
   }
 }
