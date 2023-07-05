@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phase_10_points/views/5_up_layouts/five_up_layout_2.dart';
+import 'package:phase_10_points/views/6_up_layouts/six_up_layout_1.dart';
 import 'package:phase_10_points/views/6_up_layouts/six_up_layout_2.dart';
+import 'package:phase_10_points/views/home_page.dart';
 
 import 'controllers/points_controller.dart';
 
@@ -32,14 +34,15 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
           scaffoldBackgroundColor: Colors.black),
-      home: Scaffold(
+      home: const HomePage(),
+        /*
         body: GetX<PointsController>(
           builder: (_) {
             return Stack(
               alignment: AlignmentDirectional.center,
               children: [
-                //const SixUpLayout1(),
-                const SixUpLayout2(),
+                const SixUpLayout1(),
+                //const SixUpLayout2(),
                 //const FiveUpLayout1(),
                 //const FiveUpLayout2(),
                 //const FourUpLayout1(),
@@ -66,7 +69,7 @@ class MyApp extends StatelessWidget {
             );
           },
         ),
-      ),
+*/
     );
   }
 }
