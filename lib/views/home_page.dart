@@ -101,7 +101,7 @@ class _HomePageState extends State<HomePage> {
           }),
           child: AnimatedOpacity(
             opacity: _visible ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 500),
+            duration: const Duration(milliseconds: 300),
             child: SvgPicture.asset(
               layouts[i],
               colorFilter: i == _selectedLayout - 1
