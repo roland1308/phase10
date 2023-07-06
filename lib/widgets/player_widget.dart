@@ -15,10 +15,10 @@ class PlayerWidget extends StatefulWidget {
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-  int points = 0;
-  Timer? autoPoints;
-  Timer? hidePartial;
-  int phase = 1;
+  int _points = 0;
+  Timer? _autoPoints;
+  Timer? _hidePartial;
+  int _phase = 1;
 
   final pointsController = Get.put(PointsController());
 
@@ -28,7 +28,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   startSum(int x) {
-    autoPoints = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+    _autoPoints = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       resetPartial();
       changePoints(x);
     });
@@ -36,9 +36,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void changePointsState(int x) {
     setState(() {
-      points += x;
-      if (points < 0) {
-        points = 0;
+      _points += x;
+      if (_points < 0) {
+        _points = 0;
       } else {
         pointsController.showPartial(true);
         pointsController.updatePartial(x);
@@ -47,22 +47,22 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void resetPartial() {
-    if (hidePartial != null) hidePartial!.cancel();
-    hidePartial = Timer(const Duration(seconds: 1), () {
+    if (_hidePartial != null) _hidePartial!.cancel();
+    _hidePartial = Timer(const Duration(seconds: 1), () {
       pointsController.showPartial(false);
       pointsController.resetPartial();
     });
   }
 
   stopSum() {
-    if (autoPoints != null) autoPoints!.cancel();
+    if (_autoPoints != null) _autoPoints!.cancel();
   }
 
   changePhase(int x) {
     setState(() {
-      phase += x;
-      if (phase == 0) phase = 1;
-      if (phase == 11) phase = 10;
+      _phase += x;
+      if (_phase == 0) _phase = 1;
+      if (_phase == 11) _phase = 10;
     });
   }
 
@@ -77,7 +77,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               width: widget.maxWidth / 6,
               child: Center(
                 child: GestureDetector(
-                  onTap: () => changePoints(-1),
+                  onTap: () => changePoints(-5),
                   onLongPress: () => startSum(-10),
                   onLongPressUp: () => stopSum(),
                   child: Text(
@@ -94,7 +94,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   Center(
                     child: FittedBox(
                       child: Text(
-                        points.toString(),
+                        _points.toString(),
                         style: TextStyle(color: widget.color, fontSize: 80),
                       ),
                     ),
@@ -106,7 +106,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               width: widget.maxWidth / 6,
               child: Center(
                 child: GestureDetector(
-                  onTap: () => changePoints(1),
+                  onTap: () => changePoints(5),
                   onLongPress: () => startSum(10),
                   onLongPressUp: () => stopSum(),
                   child: Text(
@@ -140,7 +140,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             style: TextStyle(color: widget.color, fontSize: 20),
           ),
           Text(
-            ((phase / 80).toStringAsFixed(2)).substring(2),
+            _phase.toString(),
             style: TextStyle(color: widget.color, fontSize: 20),
           ),
           GestureDetector(
