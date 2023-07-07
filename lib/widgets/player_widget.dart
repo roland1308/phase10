@@ -19,6 +19,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Timer? _autoPoints;
   Timer? _hidePartial;
   int _phase = 1;
+  String _name = "player";
 
   final pointsController = Get.put(PointsController());
 
@@ -95,7 +96,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     child: FittedBox(
                       child: Text(
                         _points.toString(),
-                        style: TextStyle(color: widget.color, fontSize: 80),
+                        style: TextStyle(color: widget.color, fontSize: 100),
                       ),
                     ),
                   ),
@@ -104,14 +105,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             ),
             SizedBox(
               width: widget.maxWidth / 6,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () => changePoints(5),
-                  onLongPress: () => startSum(10),
-                  onLongPressUp: () => stopSum(),
-                  child: Text(
-                    "+",
-                    style: TextStyle(color: widget.color, fontSize: 70),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 40.0),
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () => changePoints(5),
+                    onLongPress: () => startSum(10),
+                    onLongPressUp: () => stopSum(),
+                    child: Text(
+                      "+",
+                      style: TextStyle(color: widget.color, fontSize: 70),
+                    ),
                   ),
                 ),
               ),
@@ -119,6 +123,19 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           ],
         ),
         buildPhase(),
+        Positioned(
+          bottom: 0,
+          child: GestureDetector(
+            onLongPress: () {
+              _changeName(context);
+            },
+            child: Text(_name.toUpperCase(),
+                style: TextStyle(
+                    color: widget.color,
+                    fontSize: 20,
+                    overflow: TextOverflow.ellipsis)),
+          ),
+        )
       ],
     );
   }
@@ -137,7 +154,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           ),
           Text(
             "Phase:  ",
-            style: TextStyle(color: widget.color, fontSize: 20),
+            style: TextStyle(color: widget.color, fontSize: 17),
           ),
           Text(
             _phase.toString(),
@@ -153,5 +170,23 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         ],
       ),
     );
+  }
+
+  Future<void> _changeName(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: TextField(
+              autofocus: true,
+              onChanged: (value) {
+                setState(() {
+                  _name = value;
+                });
+              },
+              decoration: const InputDecoration(hintText: "Nombre jugador", ),
+            ),
+          );
+        });
   }
 }

@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:phase_10_points/utils/constants.dart';
+import 'package:phase_10_points/views/instructions.dart';
 import 'package:phase_10_points/views/view_layout.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    sleep(const Duration(milliseconds:500));
     WidgetsBinding.instance
         .addPostFrameCallback((_) => FlutterNativeSplash.remove());
   }
@@ -33,9 +37,23 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Image.asset(
-              "assets/phase_10.png",
-              height: 200,
+            Stack(
+              alignment: AlignmentDirectional.topEnd,
+              children: [
+                Image.asset(
+                  "assets/phase_10.png",
+                  height: 200,
+                ),
+                Transform.translate(
+                    offset: const Offset(20, -20),
+                    child: IconButton(
+                        onPressed: () => Get.to(Instructions()),
+                        icon: const Icon(
+                          Icons.info,
+                          color: Colors.white,
+                          size: 30,
+                        )))
+              ],
             ),
             Column(
               children: [

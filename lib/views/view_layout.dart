@@ -15,6 +15,7 @@ class ViewLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: GetX<PointsController>(builder: (_) {
         return Stack(alignment: AlignmentDirectional.center, children: [
           kLayouts[players].layoutWidgets[layout],
