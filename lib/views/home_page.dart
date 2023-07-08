@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:phase_10_points/utils/constants.dart';
 import 'package:phase_10_points/views/instructions.dart';
 import 'package:phase_10_points/views/view_layout.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,7 +24,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    sleep(const Duration(milliseconds:500));
+    if(!kIsWeb) {
+      sleep(const Duration(milliseconds: 500));
+    }
     WidgetsBinding.instance
         .addPostFrameCallback((_) => FlutterNativeSplash.remove());
   }
@@ -47,7 +50,7 @@ class _HomePageState extends State<HomePage> {
                 Transform.translate(
                     offset: const Offset(20, -20),
                     child: IconButton(
-                        onPressed: () => Get.to(Instructions()),
+                        onPressed: () => Get.to(() => (Instructions())),
                         icon: const Icon(
                           Icons.info,
                           color: Colors.white,
@@ -86,7 +89,8 @@ class _HomePageState extends State<HomePage> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  Get.to(ViewLayout(_players.toInt() - 2, _selectedLayout - 1));
+                  Get.to(() =>
+                      (ViewLayout(_players.toInt() - 2, _selectedLayout - 1)));
                 },
                 child: const Text("INICIO"))
           ],

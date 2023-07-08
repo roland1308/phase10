@@ -5,11 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PlayersNameController extends GetxController {
   Rx<Queue<String>> lastUsers =
-      Queue<String>.from(List.generate(6, (index) => "", growable: false)).obs;
+      Queue<String>.from([]).obs;
 
   addUser(String newName) async {
+    if(lastUsers.value.isNotEmpty && lastUsers.value.length == 6) {
+      lastUsers.value.removeLast();
+    }
     lastUsers.value.addFirst(newName.toUpperCase());
-    lastUsers.value.removeLast();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setStringList("lastUsers", lastUsers.value.toList());
     update();
@@ -21,10 +23,8 @@ class PlayersNameController extends GetxController {
 
   @override
   Future<void> onInit() async {
-    print("QI");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    lastUsers.value.clear();
-    lastUsers.value.addAll(prefs.getStringList("lastUsers") ?? []);
+    lastUsers.value=Queue<String>.from(prefs.getStringList("lastUsers") ?? []);
     super.onInit();
   }
 }

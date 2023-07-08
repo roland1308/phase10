@@ -35,7 +35,7 @@ class Instructions extends StatelessWidget {
               ),
               SizedBox(height: 8.0),
               Text(
-                'El juego Phase 10 fue creado por Kenneth Johnson en el 1982. Era publicado por Fundex Games pero en el 2010 Mattel (en inglés) adquiere los derechos para su publicación a nivel mundial. El juego está basado en el juego de cartas Rummy (reglas del juego en inglés) que se juega utilizando una baraja estándar.',
+                'El juego Phase 10 fue creado por Kenneth Johnson en el 1982. Era publicado por Fundex Games pero en el 2010 Mattel (en inglés) adquiere los derechos para su publicación a nivel mundial. El juego está basado en el juego de cartas Rummy que se juega utilizando una baraja estándar.',
                 style: TextStyle(fontSize: 18),
               ),
               SizedBox(height: 8.0),

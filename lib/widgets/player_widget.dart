@@ -202,27 +202,27 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 Column(
                   children: [
                     for (var text in _playersNameController.lastUsers.value)
-                      Column(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _name = text;
-                                Get.back();
-                              });
-                            },
-                            child: Text(
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _name = text;
+                            Get.back();
+                          });
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
                               text,
                               style: const TextStyle(fontSize: 23),
                               overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          const Divider(),
-                        ],
+                            const Divider(),
+                          ],
+                        ),
                       )
                   ],
                 ),
-                const SizedBox(height: 40),
                 TextField(
                   style: const TextStyle(fontSize: 23),
                   autofocus: true,
@@ -230,8 +230,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   onTapOutside: (_) {
                     if (_nameController.text != "" &&
                         !_playersNameController
-                            .contains(_nameController.text)) {
-                      _playersNameController.addUser(_nameController.text);
+                            .contains(_nameController.text.trim())) {
+                      _playersNameController
+                          .addUser(_nameController.text.trim());
                     }
                   },
                   onChanged: (value) {
@@ -239,7 +240,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       if (value == "") {
                         value = "PLAYER";
                       }
-                      _name = value;
+                      _name = value.trim();
                     });
                   },
                   decoration: const InputDecoration(
