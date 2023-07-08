@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:phase_10_points/controllers/players_name_controller.dart';
 import 'package:phase_10_points/controllers/points_controller.dart';
 
 class PlayerWidget extends StatefulWidget {
@@ -19,9 +21,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Timer? _autoPoints;
   Timer? _hidePartial;
   int _phase = 1;
+  TextEditingController _nameController = TextEditingController(text: "");
   String _name = "player";
 
-  final pointsController = Get.put(PointsController());
+  final _pointsController = Get.put(PointsController());
+  final _playersNameController = Get.put(PlayersNameController());
 
   changePoints(int x) {
     resetPartial();
@@ -41,8 +45,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       if (_points < 0) {
         _points = 0;
       } else {
-        pointsController.showPartial(true);
-        pointsController.updatePartial(x);
+        _pointsController.showPartial(true);
+        _pointsController.updatePartial(x);
       }
     });
   }
@@ -50,8 +54,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   void resetPartial() {
     if (_hidePartial != null) _hidePartial!.cancel();
     _hidePartial = Timer(const Duration(seconds: 1), () {
-      pointsController.showPartial(false);
-      pointsController.resetPartial();
+      _pointsController.showPartial(false);
+      _pointsController.resetPartial();
     });
   }
 
@@ -94,9 +98,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 children: [
                   Center(
                     child: FittedBox(
-                      child: Text(
-                        _points.toString(),
-                        style: TextStyle(color: widget.color, fontSize: 100),
+                      child: AnimatedFlipCounter(
+                        value: _points,
+                        textStyle: TextStyle(
+                          fontSize: 100,
+                          color: widget.color,
+                        ),
                       ),
                     ),
                   ),
@@ -112,9 +119,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     onTap: () => changePoints(5),
                     onLongPress: () => startSum(10),
                     onLongPressUp: () => stopSum(),
-                    child: Text(
-                      "+",
-                      style: TextStyle(color: widget.color, fontSize: 70),
+                    child: FittedBox(
+                      child: Text(
+                        "+",
+                        style: TextStyle(color: widget.color, fontSize: 60),
+                      ),
                     ),
                   ),
                 ),
@@ -156,10 +165,20 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             "Phase:  ",
             style: TextStyle(color: widget.color, fontSize: 17),
           ),
+          AnimatedFlipCounter(
+            value: _phase,
+            prefix: _phase < 10 ? "0" : null,
+            textStyle: TextStyle(
+              fontSize: 20,
+              color: widget.color,
+            ),
+          ),
+/*
           Text(
             _phase.toString(),
             style: TextStyle(color: widget.color, fontSize: 20),
           ),
+*/
           GestureDetector(
             onTap: () => changePhase(1),
             child: Text(
@@ -177,14 +196,57 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            content: TextField(
-              autofocus: true,
-              onChanged: (value) {
-                setState(() {
-                  _name = value;
-                });
-              },
-              decoration: const InputDecoration(hintText: "Nombre jugador", ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Column(
+                  children: [
+                    for (var text in _playersNameController.lastUsers.value)
+                      Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _name = text;
+                                Get.back();
+                              });
+                            },
+                            child: Text(
+                              text,
+                              style: const TextStyle(fontSize: 23),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const Divider(),
+                        ],
+                      )
+                  ],
+                ),
+                const SizedBox(height: 40),
+                TextField(
+                  style: const TextStyle(fontSize: 23),
+                  autofocus: true,
+                  controller: _nameController,
+                  onTapOutside: (_) {
+                    if (_nameController.text != "" &&
+                        !_playersNameController
+                            .contains(_nameController.text)) {
+                      _playersNameController.addUser(_nameController.text);
+                    }
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      if (value == "") {
+                        value = "PLAYER";
+                      }
+                      _name = value;
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    hintText: "Nombre jugador",
+                  ),
+                ),
+              ],
             ),
           );
         });
