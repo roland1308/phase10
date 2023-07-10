@@ -73,8 +73,4 @@ enum SchemasEnum {
   final int players;
   final List<String> assetImages;
   final List<Widget> layoutWidgets;
-
-  int get nrOfPlayers => players;
-  List<String> get layouts => assetImages;
-  List<Widget> get widgets => layoutWidgets;
 }

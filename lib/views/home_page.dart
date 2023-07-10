@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> newGame() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt("players", _players.toInt());
+    prefs.setDouble("players", _players);
     prefs.setInt("layout", _selectedLayout);
     prefs.remove("savedGame");
     goToLayout();
@@ -152,8 +152,9 @@ class _HomePageState extends State<HomePage> {
   Future<void> loadSaved() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _players = (prefs.getInt("players") ?? 2).toDouble();
+      _players = prefs.getDouble("players") ?? 2;
       _selectedLayout = prefs.getInt("layout") ?? 1;
+      _schema = SchemasEnum.values[_players.toInt() - 2];
     });
     goToLayout();
   }
