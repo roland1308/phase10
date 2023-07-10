@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:phase_10_points/utils/constants.dart';
 
 import '../controllers/points_controller.dart';
-import '../utils/constants.dart';
 
 class ViewLayout extends StatelessWidget {
-  final int players;
+  final SchemasEnum schema;
   final int layout;
 
-  ViewLayout(this.players, this.layout, {super.key});
+  ViewLayout(this.schema, this.layout, {super.key});
 
   final pointsController = Get.put(PointsController());
 
@@ -21,7 +21,7 @@ class ViewLayout extends StatelessWidget {
           return Stack(
             alignment: AlignmentDirectional.center,
             children: [
-              kLayouts[players].layoutWidgets[layout],
+              schema.layoutWidgets[layout],
               if (pointsController.showingPartial.value)
                 Positioned(
                   top: 10,

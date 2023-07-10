@@ -19,6 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  SchemasEnum _schema = SchemasEnum.up_2;
   double _players = 2;
   int _selectedLayout = 1;
   bool _visible = true;
@@ -102,6 +103,7 @@ class _HomePageState extends State<HomePage> {
                           setState(() {
                             _selectedLayout = 1;
                             _players = value.roundToDouble();
+                            _schema = SchemasEnum.values[_players.toInt() - 2];
                             _visible = true;
                           });
                         },
@@ -115,8 +117,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: buildSchemas(
-                        kLayouts[_players.toInt() - 2].assetImages),
+                    children: buildSchemas(_schema.assetImages),
                   ),
                   if (_hasSaved ?? false)
                     ElevatedButton(
@@ -136,7 +137,7 @@ class _HomePageState extends State<HomePage> {
 
   void goToLayout() {
     Get.to(
-      () => (ViewLayout(_players.toInt() - 2, _selectedLayout - 1)),
+      () => (ViewLayout(_schema, _selectedLayout - 1)),
     )?.then((_) => checkSaved());
   }
 

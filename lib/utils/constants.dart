@@ -11,8 +11,6 @@ import 'package:phase_10_points/views/5_up_layouts/five_up_layout_2.dart';
 import 'package:phase_10_points/views/6_up_layouts/six_up_layout_1.dart';
 import 'package:phase_10_points/views/6_up_layouts/six_up_layout_2.dart';
 
-import '../models/schema_model.dart';
-
 const List<Color> kPlayersColors = [
   Colors.white,
   Colors.purple,
@@ -23,62 +21,60 @@ const List<Color> kPlayersColors = [
   Colors.cyanAccent
 ];
 
-List<Schema> kLayouts = [
-  Schema(
+enum SchemasEnum {
+  up_2(
     players: 2,
     assetImages: [
       "assets/2_up_layout_1.svg",
       "assets/2_up_layout_2.svg",
-      "assets/2_up_layout_3.svg",
+      "assets/2_up_layout_3.svg"
     ],
-    layoutWidgets: [
-      const TwoUpLayout1(),
-      const TwoUpLayout2(),
-      const TwoUpLayout3(),
-    ],
+    layoutWidgets: [TwoUpLayout1(), TwoUpLayout2(), TwoUpLayout3()],
   ),
-  Schema(
+  up_3(
     players: 3,
     assetImages: [
       "assets/3_up_layout_1.svg",
       "assets/3_up_layout_2.svg",
     ],
-    layoutWidgets: [
-      const ThreeUpLayout1(),
-      const ThreeUpLayout2(),
-    ],
+    layoutWidgets: [ThreeUpLayout1(), ThreeUpLayout2()],
   ),
-  Schema(
+  up_4(
     players: 4,
     assetImages: [
       "assets/4_up_layout_1.svg",
       "assets/4_up_layout_2.svg",
     ],
-    layoutWidgets: [
-      const FourUpLayout1(),
-      const FourUpLayout2(),
-    ],
+    layoutWidgets: [FourUpLayout1(), FourUpLayout2()],
   ),
-  Schema(
+  up_5(
     players: 5,
     assetImages: [
       "assets/5_up_layout_1.svg",
       "assets/5_up_layout_2.svg",
     ],
-    layoutWidgets: [
-      const FiveUpLayout1(),
-      const FiveUpLayout2(),
-    ],
+    layoutWidgets: [FiveUpLayout1(), FiveUpLayout2()],
   ),
-  Schema(
+  up_6(
     players: 6,
     assetImages: [
       "assets/6_up_layout_1.svg",
       "assets/6_up_layout_2.svg",
     ],
-    layoutWidgets: [
-      const SixUpLayout1(),
-      const SixUpLayout2(),
-    ],
+    layoutWidgets: [SixUpLayout1(), SixUpLayout2()],
   ),
-];
+  ;
+
+  const SchemasEnum({
+    required this.players,
+    required this.assetImages,
+    required this.layoutWidgets,
+  });
+  final int players;
+  final List<String> assetImages;
+  final List<Widget> layoutWidgets;
+
+  int get nrOfPlayers => players;
+  List<String> get layouts => assetImages;
+  List<Widget> get widgets => layoutWidgets;
+}
