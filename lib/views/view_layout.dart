@@ -5,8 +5,8 @@ import '../controllers/points_controller.dart';
 import '../utils/constants.dart';
 
 class ViewLayout extends StatelessWidget {
-  int players;
-  int layout;
+  final int players;
+  final int layout;
 
   ViewLayout(this.players, this.layout, {super.key});
 

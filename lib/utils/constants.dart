@@ -14,6 +14,7 @@ import 'package:phase_10_points/views/6_up_layouts/six_up_layout_2.dart';
 import '../models/schema_model.dart';
 
 const List<Color> kPlayersColors = [
+  Colors.white,
   Colors.purple,
   Colors.indigoAccent,
   Colors.green,

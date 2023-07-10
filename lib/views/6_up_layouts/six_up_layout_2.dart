@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:phase_10_points/widgets/player_widget.dart';
 import 'package:phase_10_points/utils/players_divider.dart';
 
-import '../../utils/constants.dart';
-
 class SixUpLayout2 extends StatelessWidget {
   const SixUpLayout2({
     super.key,

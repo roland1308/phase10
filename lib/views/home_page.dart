@@ -9,6 +9,7 @@ import 'package:phase_10_points/views/instructions.dart';
 import 'package:phase_10_points/views/view_layout.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,9 +26,24 @@ class _HomePageState extends State<HomePage> {
 
   void checkSaved() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _hasSaved = prefs.containsKey("savedGame");
-    });
+    _hasSaved = false;
+    if (prefs.containsKey("savedGame")) {
+      bool points = listEquals(
+          prefs.getStringList("points")!, ["nn", "0", "0", "0", "0", "0", "0"]);
+      bool phases = listEquals(
+          prefs.getStringList("phases")!, ["nn", "1", "1", "1", "1", "1", "1"]);
+      bool names = listEquals(prefs.getStringList("names")!, [
+        "nn",
+        "JUGADOR 1",
+        "JUGADOR 2",
+        "JUGADOR 3",
+        "JUGADOR 4",
+        "JUGADOR 5",
+        "JUGADOR 6"
+      ]);
+      _hasSaved = !points || !phases || !names;
+    }
+    setState(() {});
   }
 
   @override
