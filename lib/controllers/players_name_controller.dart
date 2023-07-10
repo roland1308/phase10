@@ -4,11 +4,10 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PlayersNameController extends GetxController {
-  Rx<Queue<String>> lastUsers =
-      Queue<String>.from([]).obs;
+  Rx<Queue<String>> lastUsers = Queue<String>.from([]).obs;
 
   addUser(String newName) async {
-    if(lastUsers.value.isNotEmpty && lastUsers.value.length == 6) {
+    if (lastUsers.value.isNotEmpty && lastUsers.value.length == 6) {
       lastUsers.value.removeLast();
     }
     lastUsers.value.addFirst(newName.toUpperCase());
@@ -24,7 +23,8 @@ class PlayersNameController extends GetxController {
   @override
   Future<void> onInit() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    lastUsers.value=Queue<String>.from(prefs.getStringList("lastUsers") ?? []);
+    lastUsers.value =
+        Queue<String>.from(prefs.getStringList("lastUsers") ?? []);
     super.onInit();
   }
 }

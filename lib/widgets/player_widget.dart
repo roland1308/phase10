@@ -5,12 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phase_10_points/controllers/players_name_controller.dart';
 import 'package:phase_10_points/controllers/points_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../utils/constants.dart';
 
 class PlayerWidget extends StatefulWidget {
   final double maxWidth;
-  final Color color;
+  final int player;
 
-  const PlayerWidget({super.key, required this.maxWidth, required this.color});
+  const PlayerWidget({
+    super.key,
+    required this.maxWidth,
+    required this.player,
+  });
 
   @override
   State<PlayerWidget> createState() => _PlayerWidgetState();
@@ -21,25 +28,25 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Timer? _autoPoints;
   Timer? _hidePartial;
   int _phase = 1;
-  TextEditingController _nameController = TextEditingController(text: "");
-  String _name = "player";
+  final TextEditingController _nameController = TextEditingController(text: "");
+  String _name = "JUGADOR";
 
   final _pointsController = Get.put(PointsController());
   final _playersNameController = Get.put(PlayersNameController());
 
-  changePoints(int x) {
+  void changePoints(int x) {
     resetPartial();
     changePointsState(x);
   }
 
-  startSum(int x) {
+  void startSum(int x) {
     _autoPoints = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       resetPartial();
       changePoints(x);
     });
   }
 
-  void changePointsState(int x) {
+  Future<void> changePointsState(int x) async {
     setState(() {
       _points += x;
       if (_points < 0) {
@@ -49,6 +56,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         _pointsController.updatePartial(x);
       }
     });
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> actualPoints = prefs.getStringList("points")!;
+    actualPoints[widget.player] = _points.toString();
+    prefs.setStringList("points", actualPoints);
   }
 
   void resetPartial() {
@@ -59,16 +70,38 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     });
   }
 
-  stopSum() {
+  void stopSum() {
     if (_autoPoints != null) _autoPoints!.cancel();
   }
 
-  changePhase(int x) {
+  Future<void> changePhase(int x) async {
     setState(() {
       _phase += x;
       if (_phase == 0) _phase = 1;
       if (_phase == 11) _phase = 10;
     });
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> actualPhases = prefs.getStringList("phases")!;
+    actualPhases[widget.player] = _phase.toString();
+    prefs.setStringList("phases", actualPhases);
+  }
+
+  Future<void> getInitialState() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.containsKey("savedGame")) {
+      setState(() {
+        _points = int.parse(prefs.getStringList("points")![widget.player]);
+        _phase = int.parse(prefs.getStringList("phases")![widget.player]);
+        _name = prefs.getStringList("names")![widget.player];
+      });
+    }
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    _name = "JUGADOR ${widget.player}";
+    getInitialState();
   }
 
   @override
@@ -87,7 +120,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   onLongPressUp: () => stopSum(),
                   child: Text(
                     "-",
-                    style: TextStyle(color: widget.color, fontSize: 70),
+                    style: TextStyle(
+                        color: kPlayersColors[widget.player], fontSize: 70),
                   ),
                 ),
               ),
@@ -102,7 +136,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         value: _points,
                         textStyle: TextStyle(
                           fontSize: 100,
-                          color: widget.color,
+                          color: kPlayersColors[widget.player],
                         ),
                       ),
                     ),
@@ -122,7 +156,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     child: FittedBox(
                       child: Text(
                         "+",
-                        style: TextStyle(color: widget.color, fontSize: 60),
+                        style: TextStyle(
+                            color: kPlayersColors[widget.player], fontSize: 60),
                       ),
                     ),
                   ),
@@ -138,11 +173,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             onLongPress: () {
               _changeName(context);
             },
-            child: Text(_name.toUpperCase(),
-                style: TextStyle(
-                    color: widget.color,
-                    fontSize: 20,
-                    overflow: TextOverflow.ellipsis)),
+            child: Text(
+              _name.toUpperCase(),
+              style: TextStyle(
+                  color: kPlayersColors[widget.player],
+                  fontSize: 20,
+                  overflow: TextOverflow.ellipsis),
+            ),
           ),
         )
       ],
@@ -158,32 +195,29 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             onTap: () => changePhase(-1),
             child: Text(
               "-  ",
-              style: TextStyle(color: widget.color, fontSize: 25),
+              style:
+                  TextStyle(color: kPlayersColors[widget.player], fontSize: 25),
             ),
           ),
           Text(
             "Phase:  ",
-            style: TextStyle(color: widget.color, fontSize: 17),
+            style:
+                TextStyle(color: kPlayersColors[widget.player], fontSize: 17),
           ),
           AnimatedFlipCounter(
             value: _phase,
             prefix: _phase < 10 ? "0" : null,
             textStyle: TextStyle(
               fontSize: 20,
-              color: widget.color,
+              color: kPlayersColors[widget.player],
             ),
           ),
-/*
-          Text(
-            _phase.toString(),
-            style: TextStyle(color: widget.color, fontSize: 20),
-          ),
-*/
           GestureDetector(
             onTap: () => changePhase(1),
             child: Text(
               "  +",
-              style: TextStyle(color: widget.color, fontSize: 25),
+              style:
+                  TextStyle(color: kPlayersColors[widget.player], fontSize: 25),
             ),
           ),
         ],
@@ -193,63 +227,72 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Future<void> _changeName(BuildContext context) async {
     return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Column(
-                  children: [
-                    for (var text in _playersNameController.lastUsers.value)
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _name = text;
-                            Get.back();
-                          });
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              text,
-                              style: const TextStyle(fontSize: 23),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const Divider(),
-                          ],
-                        ),
-                      )
-                  ],
-                ),
-                TextField(
-                  style: const TextStyle(fontSize: 23),
-                  autofocus: true,
-                  controller: _nameController,
-                  onTapOutside: (_) {
-                    if (_nameController.text != "" &&
-                        !_playersNameController
-                            .contains(_nameController.text.trim())) {
-                      _playersNameController
-                          .addUser(_nameController.text.trim());
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Column(
+                children: [
+                  for (var text in _playersNameController.lastUsers.value)
+                    GestureDetector(
+                      onTap: () async {
+                        setState(() {
+                          _name = text;
+                          Get.back();
+                        });
+                        await updateSharedPrefs(text);
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            text,
+                            style: const TextStyle(fontSize: 23),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Divider(),
+                        ],
+                      ),
+                    )
+                ],
+              ),
+              TextField(
+                style: const TextStyle(fontSize: 23),
+                autofocus: true,
+                controller: _nameController,
+                onTapOutside: (_) {
+                  if (_nameController.text != "" &&
+                      !_playersNameController
+                          .contains(_nameController.text.trim())) {
+                    _playersNameController.addUser(_nameController.text.trim());
+                  }
+                },
+                onChanged: (value) async {
+                  setState(() {
+                    if (value == "") {
+                      value = "JUGADOR ${widget.player}";
                     }
-                  },
-                  onChanged: (value) {
-                    setState(() {
-                      if (value == "") {
-                        value = "PLAYER";
-                      }
-                      _name = value.trim();
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    hintText: "Nombre jugador",
-                  ),
+                    _name = value.trim();
+                  });
+                  await updateSharedPrefs(value.trim());
+                },
+                decoration: const InputDecoration(
+                  hintText: "Nombre jugador",
                 ),
-              ],
-            ),
-          );
-        });
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> updateSharedPrefs(String text) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> actualNames = prefs.getStringList("names")!;
+    actualNames[widget.player] = text.toUpperCase();
+    prefs.setStringList("names", actualNames);
   }
 }

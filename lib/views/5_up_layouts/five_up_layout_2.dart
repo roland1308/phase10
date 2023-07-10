@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phase_10_points/widgets/player_widget.dart';
 import 'package:phase_10_points/utils/players_divider.dart';
 
-import '../../utils/constants.dart';
+import '../../utils/execute_after_build.dart';
 
 class FiveUpLayout2 extends StatelessWidget {
   const FiveUpLayout2({
@@ -11,6 +11,7 @@ class FiveUpLayout2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ExecuteAfterBuild().initializeSavedGame();
     return Column(
       children: [
         Expanded(
@@ -20,7 +21,7 @@ class FiveUpLayout2 extends StatelessWidget {
                 child: RotatedBox(
                   quarterTurns: 1,
                   child: PlayerWidget(
-                      color: kColor1,
+                      player: 1,
                       maxWidth: MediaQuery.of(context).size.height / 2),
                 ),
               ),
@@ -29,7 +30,7 @@ class FiveUpLayout2 extends StatelessWidget {
                 child: RotatedBox(
                   quarterTurns: -1,
                   child: PlayerWidget(
-                      color: kColor2,
+                      player: 2,
                       maxWidth: MediaQuery.of(context).size.height / 2),
                 ),
               ),
@@ -44,7 +45,7 @@ class FiveUpLayout2 extends StatelessWidget {
                 child: RotatedBox(
                   quarterTurns: 1,
                   child: PlayerWidget(
-                      color: kColor3,
+                      player: 3,
                       maxWidth: MediaQuery.of(context).size.height / 2),
                 ),
               ),
@@ -53,7 +54,7 @@ class FiveUpLayout2 extends StatelessWidget {
                 child: RotatedBox(
                   quarterTurns: -1,
                   child: PlayerWidget(
-                      color: kColor4,
+                      player: 4,
                       maxWidth: MediaQuery.of(context).size.height / 2),
                 ),
               ),
@@ -63,7 +64,7 @@ class FiveUpLayout2 extends StatelessWidget {
         const PlayersDivider(),
         Expanded(
           child: PlayerWidget(
-              color: kColor5, maxWidth: MediaQuery.of(context).size.height / 2),
+              player: 5, maxWidth: MediaQuery.of(context).size.height / 2),
         ),
       ],
     );

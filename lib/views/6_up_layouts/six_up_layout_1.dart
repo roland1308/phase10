@@ -20,7 +20,7 @@ class SixUpLayout1 extends StatelessWidget {
                   child: RotatedBox(
                       quarterTurns: 1,
                       child: PlayerWidget(
-                          color: kColor1,
+                          player: 1,
                           maxWidth: MediaQuery.of(context).size.height / 2))),
               SizedBox(
                   width: MediaQuery.of(context).size.width / 2,
@@ -29,7 +29,7 @@ class SixUpLayout1 extends StatelessWidget {
                   child: RotatedBox(
                       quarterTurns: 1,
                       child: PlayerWidget(
-                          color: kColor2,
+                          player: 2,
                           maxWidth: MediaQuery.of(context).size.height / 2))),
               SizedBox(
                   width: MediaQuery.of(context).size.width / 2,
@@ -38,7 +38,7 @@ class SixUpLayout1 extends StatelessWidget {
                   child: RotatedBox(
                       quarterTurns: 1,
                       child: PlayerWidget(
-                          color: kColor3,
+                          player: 3,
                           maxWidth: MediaQuery.of(context).size.height / 2))),
             ],
           ),
@@ -51,7 +51,7 @@ class SixUpLayout1 extends StatelessWidget {
                   child: RotatedBox(
                       quarterTurns: -1,
                       child: PlayerWidget(
-                          color: kColor4,
+                          player: 4,
                           maxWidth: MediaQuery.of(context).size.height / 2))),
               SizedBox(
                   width: MediaQuery.of(context).size.width / 2,
@@ -60,7 +60,7 @@ class SixUpLayout1 extends StatelessWidget {
                   child: RotatedBox(
                       quarterTurns: -1,
                       child: PlayerWidget(
-                          color: kColor5,
+                          player: 5,
                           maxWidth: MediaQuery.of(context).size.height / 2))),
               SizedBox(
                   width: MediaQuery.of(context).size.width / 2,
@@ -69,7 +69,7 @@ class SixUpLayout1 extends StatelessWidget {
                   child: RotatedBox(
                       quarterTurns: -1,
                       child: PlayerWidget(
-                          color: kColor6,
+                          player: 6,
                           maxWidth: MediaQuery.of(context).size.height / 2))),
             ],
           ),

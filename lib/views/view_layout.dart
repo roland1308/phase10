@@ -16,24 +16,29 @@ class ViewLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: GetX<PointsController>(builder: (_) {
-        return Stack(alignment: AlignmentDirectional.center, children: [
-          kLayouts[players].layoutWidgets[layout],
-          if (pointsController.showingPartial.value)
-            Positioned(
-              top: 10,
-              child: CircleAvatar(
-                radius: 50,
-                child: FittedBox(
-                  child: Text(
-                    pointsController.partialPoints.toString(),
-                    style: const TextStyle(fontSize: 150),
+      body: GetX<PointsController>(
+        builder: (_) {
+          return Stack(
+            alignment: AlignmentDirectional.center,
+            children: [
+              kLayouts[players].layoutWidgets[layout],
+              if (pointsController.showingPartial.value)
+                Positioned(
+                  top: 10,
+                  child: CircleAvatar(
+                    radius: 50,
+                    child: FittedBox(
+                      child: Text(
+                        pointsController.partialPoints.toString(),
+                        style: const TextStyle(fontSize: 150),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-        ]);
-      }),
+            ],
+          );
+        },
+      ),
     );
   }
 }

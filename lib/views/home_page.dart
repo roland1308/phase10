@@ -8,6 +8,7 @@ import 'package:phase_10_points/utils/constants.dart';
 import 'package:phase_10_points/views/instructions.dart';
 import 'package:phase_10_points/views/view_layout.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,11 +21,20 @@ class _HomePageState extends State<HomePage> {
   double _players = 2;
   int _selectedLayout = 1;
   bool _visible = true;
+  bool? _hasSaved;
+
+  void checkSaved() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _hasSaved = prefs.containsKey("savedGame");
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    if(!kIsWeb) {
+    checkSaved();
+    if (!kIsWeb) {
       sleep(const Duration(milliseconds: 500));
     }
     WidgetsBinding.instance
@@ -34,69 +44,101 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Stack(
-              alignment: AlignmentDirectional.topEnd,
-              children: [
-                Image.asset(
-                  "assets/phase_10.png",
-                  height: 200,
-                ),
-                Transform.translate(
-                    offset: const Offset(20, -20),
-                    child: IconButton(
-                        onPressed: () => Get.to(() => (Instructions())),
-                        icon: const Icon(
-                          Icons.info,
-                          color: Colors.white,
-                          size: 30,
-                        )))
-              ],
+      body: _hasSaved == null
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Stack(
+                    alignment: AlignmentDirectional.topEnd,
+                    children: [
+                      Image.asset(
+                        "assets/phase_10.png",
+                        height: 200,
+                      ),
+                      Transform.translate(
+                        offset: const Offset(20, -20),
+                        child: IconButton(
+                          onPressed: () => Get.to(() => (Instructions())),
+                          icon: const Icon(
+                            Icons.info,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Slider(
+                        min: 2.0,
+                        max: 6.0,
+                        value: _players,
+                        divisions: 8,
+                        onChanged: (value) {
+                          changePlayers(value);
+                        },
+                        onChangeEnd: (value) {
+                          setState(() {
+                            _selectedLayout = 1;
+                            _players = value.roundToDouble();
+                            _visible = true;
+                          });
+                        },
+                      ),
+                      Text(
+                        'Número de jugadores: ${_players.toInt()}',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: buildSchemas(
+                        kLayouts[_players.toInt() - 2].assetImages),
+                  ),
+                  if (_hasSaved ?? false)
+                    ElevatedButton(
+                      onPressed: () => loadSaved(),
+                      child:
+                          const Center(child: Text("CONTINUA JUEGO GUARDADO")),
+                    ),
+                  ElevatedButton(
+                    onPressed: () => newGame(),
+                    child: const Center(child: Text("EMPIEZA UN NUEVO JUEGO")),
+                  ),
+                ],
+              ),
             ),
-            Column(
-              children: [
-                Slider(
-                  min: 2.0,
-                  max: 6.0,
-                  value: _players,
-                  divisions: 8,
-                  onChanged: (value) {
-                    changePlayers(value);
-                  },
-                  onChangeEnd: (value) {
-                    setState(() {
-                      _selectedLayout = 1;
-                      _players = value.roundToDouble();
-                      _visible = true;
-                    });
-                  },
-                ),
-                Text(
-                  'Número de jugadores: ${_players.toInt()}',
-                  style: const TextStyle(color: kColor1, fontSize: 20),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children:
-                  buildSchemas(kLayouts[_players.toInt() - 2].assetImages),
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  Get.to(() =>
-                      (ViewLayout(_players.toInt() - 2, _selectedLayout - 1)));
-                },
-                child: const Text("INICIO"))
-          ],
-        ),
-      ),
     );
+  }
+
+  void goToLayout() {
+    Get.to(
+      () => (ViewLayout(_players.toInt() - 2, _selectedLayout - 1)),
+    )?.then((_) => checkSaved());
+  }
+
+  Future<void> newGame() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt("players", _players.toInt());
+    prefs.setInt("layout", _selectedLayout);
+    prefs.remove("savedGame");
+    goToLayout();
+  }
+
+  Future<void> loadSaved() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _players = (prefs.getInt("players") ?? 2).toDouble();
+      _selectedLayout = prefs.getInt("layout") ?? 1;
+    });
+    goToLayout();
   }
 
   Future<void> changePlayers(double value) async {

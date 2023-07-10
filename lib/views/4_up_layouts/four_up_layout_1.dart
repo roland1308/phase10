@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phase_10_points/widgets/player_widget.dart';
 import 'package:phase_10_points/utils/players_divider.dart';
 
-import '../../utils/constants.dart';
+import '../../utils/execute_after_build.dart';
 
 class FourUpLayout1 extends StatelessWidget {
   const FourUpLayout1({
@@ -11,6 +11,7 @@ class FourUpLayout1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ExecuteAfterBuild().initializeSavedGame();
     return Row(
       children: [
         Expanded(
@@ -20,7 +21,7 @@ class FourUpLayout1 extends StatelessWidget {
                   child: RotatedBox(
                       quarterTurns: 1,
                       child: PlayerWidget(
-                          color: kColor1,
+                          player: 1,
                           maxWidth: MediaQuery.of(context).size.height / 2))),
               SizedBox(
                   width: MediaQuery.of(context).size.width / 2,
@@ -29,7 +30,7 @@ class FourUpLayout1 extends StatelessWidget {
                   child: RotatedBox(
                       quarterTurns: 1,
                       child: PlayerWidget(
-                          color: kColor2,
+                          player: 2,
                           maxWidth: MediaQuery.of(context).size.height / 2))),
             ],
           ),
@@ -42,7 +43,7 @@ class FourUpLayout1 extends StatelessWidget {
                   child: RotatedBox(
                       quarterTurns: -1,
                       child: PlayerWidget(
-                          color: kColor3,
+                          player: 3,
                           maxWidth: MediaQuery.of(context).size.height / 2))),
               SizedBox(
                   width: MediaQuery.of(context).size.width / 2,
@@ -51,7 +52,7 @@ class FourUpLayout1 extends StatelessWidget {
                   child: RotatedBox(
                       quarterTurns: -1,
                       child: PlayerWidget(
-                          color: kColor4,
+                          player: 4,
                           maxWidth: MediaQuery.of(context).size.height / 2))),
             ],
           ),

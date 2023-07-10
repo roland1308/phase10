@@ -13,12 +13,14 @@ import 'package:phase_10_points/views/6_up_layouts/six_up_layout_2.dart';
 
 import '../models/schema_model.dart';
 
-const Color kColor1 = Colors.purple;
-const Color kColor2 = Colors.indigoAccent;
-const Color kColor3 = Colors.green;
-const Color kColor4 = Colors.amberAccent;
-const Color kColor5 = Colors.deepOrangeAccent;
-const Color kColor6 = Colors.cyanAccent;
+const List<Color> kPlayersColors = [
+  Colors.purple,
+  Colors.indigoAccent,
+  Colors.green,
+  Colors.amberAccent,
+  Colors.deepOrangeAccent,
+  Colors.cyanAccent
+];
 
 List<Schema> kLayouts = [
   Schema(

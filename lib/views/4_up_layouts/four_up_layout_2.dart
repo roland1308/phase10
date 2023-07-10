@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phase_10_points/widgets/player_widget.dart';
 import 'package:phase_10_points/utils/players_divider.dart';
 
-import '../../utils/constants.dart';
+import '../../utils/execute_after_build.dart';
 
 class FourUpLayout2 extends StatelessWidget {
   const FourUpLayout2({
@@ -11,12 +11,13 @@ class FourUpLayout2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ExecuteAfterBuild().initializeSavedGame();
     return Column(
       children: [
         RotatedBox(
           quarterTurns: 2,
           child: PlayerWidget(
-              color: kColor1, maxWidth: MediaQuery.of(context).size.width),
+              player: 1, maxWidth: MediaQuery.of(context).size.width),
         ),
         const PlayersDivider(),
         Expanded(
@@ -26,7 +27,7 @@ class FourUpLayout2 extends StatelessWidget {
                 child: RotatedBox(
                   quarterTurns: 1,
                   child: PlayerWidget(
-                      color: kColor2,
+                      player: 2,
                       maxWidth: MediaQuery.of(context).size.height / 2),
                 ),
               ),
@@ -35,7 +36,7 @@ class FourUpLayout2 extends StatelessWidget {
                 child: RotatedBox(
                   quarterTurns: -1,
                   child: PlayerWidget(
-                      color: kColor3,
+                      player: 3,
                       maxWidth: MediaQuery.of(context).size.height / 2),
                 ),
               ),
@@ -44,7 +45,7 @@ class FourUpLayout2 extends StatelessWidget {
         ),
         const PlayersDivider(),
         PlayerWidget(
-            color: kColor4, maxWidth: MediaQuery.of(context).size.width),
+            player: 4, maxWidth: MediaQuery.of(context).size.width),
       ],
     );
   }
