@@ -20,12 +20,10 @@ class _LeaderboardState extends State<Leaderboard> {
   List<String> names = [];
   getResults() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
       players = (prefs.getDouble("players")!.roundToDouble()).toInt();
-      points = prefs.getStringList("points")!..removeAt(0);
-      phases = prefs.getStringList("phases")!..removeAt(0);
-      names = prefs.getStringList("names")!..removeAt(0);
-    });
+      points = (prefs.getStringList("points")!).getRange(1,players+1).toList();
+      phases = (prefs.getStringList("phases")!).getRange(1,players+1).toList();
+      names = (prefs.getStringList("names")!).getRange(1,players+1).toList();
 
     List<int> indices = List.generate(points.length, (index) => index);
 
@@ -48,8 +46,17 @@ class _LeaderboardState extends State<Leaderboard> {
   }
 
   @override
+  void didUpdateWidget(covariant Leaderboard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget._isResultVisible != oldWidget._isResultVisible) {
+      if (widget._isResultVisible) {
+        getResults();
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (widget._isResultVisible) getResults();
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
       top: widget._isResultVisible ? 40 : -480,

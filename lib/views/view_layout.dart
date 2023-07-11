@@ -54,6 +54,7 @@ class _ViewLayoutState extends State<ViewLayout> {
                       ),
                     ),
                   ),
+                if(_isResultVisible) Container(color: Colors.black.withOpacity(.5),),
                 Leaderboard(isResultVisible: _isResultVisible),
               ],
             );
