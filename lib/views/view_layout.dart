@@ -25,10 +25,11 @@ class _ViewLayoutState extends State<ViewLayout> {
   final PointsController _pointsController = Get.find();
   bool _isResultVisible = false;
 
-  int players = 0;
-  List<String> names = [];
-  String userToMark = "";
-  int pointsToMark = 0;
+  int _players = 0;
+  List<String> _names = [];
+  String _userToMark = "";
+  int _pointsToMark = 0;
+  bool _isPhase = false;
 
   @override
   void initState() {
@@ -40,12 +41,11 @@ class _ViewLayoutState extends State<ViewLayout> {
   void _initSpeech() async {
     _speechEnabled = await speechToText.initialize();
     setState(() {});
-    //getNames();
   }
 
   Future<void> getNames() async {
-    players = _pointsController.players.roundToDouble().toInt();
-    names = _pointsController.names.getRange(1, players + 1).toList();
+    _players = _pointsController.players.roundToDouble().toInt();
+    _names = _pointsController.names.getRange(1, _players + 1).toList();
   }
 
   /// Each time to start a speech recognition session
@@ -74,16 +74,25 @@ class _ViewLayoutState extends State<ViewLayout> {
     setState(() {});
     _lastWords = result.recognizedWords;
     print(_lastWords);
+    _isPhase = _lastWords.contains("phase") || _lastWords.contains("fase");
     for (String str in _lastWords.split(" ")) {
-      if (names.contains(str.toUpperCase())) {
-        userToMark = str;
+      if (_names.contains(str.toUpperCase())) {
+        _userToMark = str;
         break;
       }
     }
-    pointsToMark = (spanishWordsToNumber(_lastWords));
-    if (userToMark != "" && pointsToMark > 0) {
-      int userIndex = _pointsController.names.indexOf(userToMark.toUpperCase());
-      _pointsController.changePointsState(userIndex, pointsToMark);
+
+    if (_userToMark != "") {
+      int userIndex = _pointsController.names.indexOf(_userToMark.toUpperCase());
+      if (_isPhase) {
+        _pointsController.changePhase(userIndex, 1);
+      }
+      else {
+        _pointsToMark = (spanishWordsToNumber(_lastWords));
+        if (_pointsToMark > 0) {
+          _pointsController.changePointsState(userIndex, _pointsToMark);
+        }
+      }
     }
   }
 
