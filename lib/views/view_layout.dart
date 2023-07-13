@@ -73,7 +73,6 @@ class _ViewLayoutState extends State<ViewLayout> {
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {});
     _lastWords = result.recognizedWords;
-    print(_lastWords);
     _isPhase = _lastWords.contains("phase") || _lastWords.contains("fase");
     for (String str in _lastWords.split(" ")) {
       if (_names.contains(str.toUpperCase())) {
