@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
+
+import '../controllers/points_controller.dart';
 
 class Leaderboard extends StatefulWidget {
   const Leaderboard({
@@ -14,29 +16,28 @@ class Leaderboard extends StatefulWidget {
 }
 
 class _LeaderboardState extends State<Leaderboard> {
+
+  final PointsController _pointsController = Get.find();
   int players = 0;
-  List<String> points = [];
-  List<String> phases = [];
+  List<int> points = [];
+  List<int> phases = [];
   List<String> names = [];
-  getResults() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-      players = (prefs.getDouble("players")!.roundToDouble()).toInt();
-      points = (prefs.getStringList("points")!).getRange(1,players+1).toList();
-      phases = (prefs.getStringList("phases")!).getRange(1,players+1).toList();
-      names = (prefs.getStringList("names")!).getRange(1,players+1).toList();
+
+  getResults() {
+      players = (_pointsController.players.roundToDouble()).toInt();
+      points = (_pointsController.points).getRange(1,players+1).toList();
+      phases = (_pointsController.phases).getRange(1,players+1).toList();
+      names = (_pointsController.names).getRange(1,players+1).toList();
 
     List<int> indices = List.generate(points.length, (index) => index);
 
     indices.sort((a, b) {
-      double pointsA = double.parse(points[a]);
-      double pointsB = double.parse(points[b]);
-
-      int pointsComparison = pointsA.compareTo(pointsB);
+      int pointsComparison = points[a].compareTo(points[b]);
       if (pointsComparison != 0) {
         return pointsComparison;
       } else {
         return phases[b].compareTo(
-            phases[a]); // Inverti l'ordine di "phases" invertendo gli indici
+            phases[a]);
       }
     });
 
@@ -124,9 +125,9 @@ class _LeaderboardState extends State<Leaderboard> {
 
 class SingleResult extends StatelessWidget {
   final int i;
-  final String points;
+  final int points;
   final String name;
-  final String phase;
+  final int phase;
 
   const SingleResult(
     this.i,
@@ -181,7 +182,7 @@ class SingleResult extends StatelessWidget {
           CircleAvatar(
             radius: 12,
             child: Text(
-              phase,
+              phase.toString(),
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: 15,

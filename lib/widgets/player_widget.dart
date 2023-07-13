@@ -5,15 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phase_10_points/controllers/players_name_controller.dart';
 import 'package:phase_10_points/controllers/points_controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/constants.dart';
 
 class PlayerWidget extends StatefulWidget {
+  final PointsController pointsController = Get.find();
+
   final double maxWidth;
   final int player;
 
-  const PlayerWidget({
+  PlayerWidget({
     super.key,
     required this.maxWidth,
     required this.player,
@@ -24,19 +25,17 @@ class PlayerWidget extends StatefulWidget {
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-  int _points = 0;
   Timer? _autoPoints;
   Timer? _hidePartial;
-  int _phase = 1;
-  final TextEditingController _nameController = TextEditingController(text: "");
-  String _name = "JUGADOR";
 
-  final _pointsController = Get.put(PointsController());
+  final TextEditingController _nameController = TextEditingController(text: "");
+
+  final PointsController _pointsController = Get.find();
   final _playersNameController = Get.put(PlayersNameController());
 
   void changePoints(int x) {
     resetPartial();
-    changePointsState(x);
+    _pointsController.changePointsState(widget.player, x);
   }
 
   void startSum(int x) {
@@ -44,22 +43,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       resetPartial();
       changePoints(x);
     });
-  }
-
-  Future<void> changePointsState(int x) async {
-    setState(() {
-      _points += x;
-      if (_points < 0) {
-        _points = 0;
-      } else {
-        _pointsController.showPartial(true);
-        _pointsController.updatePartial(x);
-      }
-    });
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> actualPoints = prefs.getStringList("points")!;
-    actualPoints[widget.player] = _points.toString();
-    prefs.setStringList("points", actualPoints);
   }
 
   void resetPartial() {
@@ -74,34 +57,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     if (_autoPoints != null) _autoPoints!.cancel();
   }
 
-  Future<void> changePhase(int x) async {
-    setState(() {
-      _phase += x;
-      if (_phase == 0) _phase = 1;
-      if (_phase == 11) _phase = 10;
-    });
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> actualPhases = prefs.getStringList("phases")!;
-    actualPhases[widget.player] = _phase.toString();
-    prefs.setStringList("phases", actualPhases);
-  }
-
-  Future<void> getInitialState() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.containsKey("savedGame")) {
-      setState(() {
-        _points = int.parse(prefs.getStringList("points")![widget.player]);
-        _phase = int.parse(prefs.getStringList("phases")![widget.player]);
-        _name = prefs.getStringList("names")![widget.player];
-      });
-    }
-  }
-
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    _name = "JUGADOR ${widget.player}";
-    getInitialState();
   }
 
   @override
@@ -126,23 +84,27 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 ),
               ),
             ),
-            Expanded(
-              child: Stack(
-                alignment: AlignmentDirectional.topCenter,
-                children: [
-                  Center(
-                    child: FittedBox(
-                      child: AnimatedFlipCounter(
-                        value: _points,
-                        textStyle: TextStyle(
-                          fontSize: 100,
-                          color: kPlayersColors[widget.player],
+            GetX<PointsController>(
+              builder: (context) {
+                return Expanded(
+                  child: Stack(
+                    alignment: AlignmentDirectional.topCenter,
+                    children: [
+                      Center(
+                        child: FittedBox(
+                          child: AnimatedFlipCounter(
+                            value: _pointsController.points[widget.player],
+                            textStyle: TextStyle(
+                              fontSize: 100,
+                              color: kPlayersColors[widget.player],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              }
             ),
             SizedBox(
               width: widget.maxWidth / 6,
@@ -167,20 +129,24 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           ],
         ),
         buildPhase(),
-        Positioned(
-          bottom: 0,
-          child: GestureDetector(
-            onLongPress: () {
-              _changeName(context);
-            },
-            child: Text(
-              _name.toUpperCase(),
-              style: TextStyle(
-                  color: kPlayersColors[widget.player],
-                  fontSize: 20,
-                  overflow: TextOverflow.ellipsis),
-            ),
-          ),
+        GetX<PointsController>(
+          builder: (_) {
+            return Positioned(
+              bottom: 0,
+              child: GestureDetector(
+                onLongPress: () {
+                  _changeName(context);
+                },
+                child: Text(
+                  _pointsController.names[widget.player].toUpperCase(),
+                  style: TextStyle(
+                      color: kPlayersColors[widget.player],
+                      fontSize: 20,
+                      overflow: TextOverflow.ellipsis),
+                ),
+              ),
+            );
+          }
         )
       ],
     );
@@ -189,38 +155,44 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Positioned buildPhase() {
     return Positioned(
       top: 0,
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => changePhase(-1),
-            child: Text(
-              "-  ",
-              style:
-                  TextStyle(color: kPlayersColors[widget.player], fontSize: 25),
-            ),
-          ),
-          Text(
-            "Phase:  ",
-            style:
-                TextStyle(color: kPlayersColors[widget.player], fontSize: 17),
-          ),
-          AnimatedFlipCounter(
-            value: _phase,
-            prefix: _phase < 10 ? "0" : null,
-            textStyle: TextStyle(
-              fontSize: 20,
-              color: kPlayersColors[widget.player],
-            ),
-          ),
-          GestureDetector(
-            onTap: () => changePhase(1),
-            child: Text(
-              "  +",
-              style:
-                  TextStyle(color: kPlayersColors[widget.player], fontSize: 25),
-            ),
-          ),
-        ],
+      child: GetX<PointsController>(
+        builder: (_) {
+          return Row(
+            children: [
+              GestureDetector(
+                onTap: () => _pointsController.changePhase(widget.player, -1),
+                child: Text(
+                  "-  ",
+                  style:
+                      TextStyle(color: kPlayersColors[widget.player], fontSize: 25),
+                ),
+              ),
+              Text(
+                "Phase:  ",
+                style:
+                    TextStyle(color: kPlayersColors[widget.player], fontSize: 17),
+              ),
+              AnimatedFlipCounter(
+                value: _pointsController.phases[widget.player],
+                prefix: _pointsController.phases[widget.player].toInt() < 10
+                    ? "0"
+                    : null,
+                textStyle: TextStyle(
+                  fontSize: 20,
+                  color: kPlayersColors[widget.player],
+                ),
+              ),
+              GestureDetector(
+                onTap: () => _pointsController.changePhase(widget.player, 1),
+                child: Text(
+                  "  +",
+                  style:
+                      TextStyle(color: kPlayersColors[widget.player], fontSize: 25),
+                ),
+              ),
+            ],
+          );
+        }
       ),
     );
   }
@@ -238,11 +210,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   for (var text in _playersNameController.lastUsers.value)
                     GestureDetector(
                       onTap: () async {
-                        setState(() {
-                          _name = text;
-                          Get.back();
-                        });
-                        await updateSharedPrefs(text);
+                        _pointsController.setName(widget.player, text);
+                        Get.back();
                       },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -270,13 +239,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   }
                 },
                 onChanged: (value) async {
-                  setState(() {
-                    if (value == "") {
-                      value = "JUGADOR ${widget.player}";
-                    }
-                    _name = value.trim();
-                  });
-                  await updateSharedPrefs(value.trim());
+                  if (value == "") {
+                    value = "JUGADOR ${widget.player}";
+                  }
+                  _pointsController.setName(widget.player, value.trim());
                 },
                 decoration: const InputDecoration(
                   hintText: "Nombre jugador",
@@ -287,12 +253,5 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         );
       },
     );
-  }
-
-  Future<void> updateSharedPrefs(String text) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> actualNames = prefs.getStringList("names")!;
-    actualNames[widget.player] = text.toUpperCase();
-    prefs.setStringList("names", actualNames);
   }
 }

@@ -3,7 +3,7 @@ import 'package:phase_10_points/widgets/player_widget.dart';
 import 'package:phase_10_points/utils/players_divider.dart';
 
 import '../../utils/constants.dart';
-import '../../utils/execute_after_build.dart';
+
 
 class SixUpLayout1 extends StatelessWidget {
   const SixUpLayout1({
@@ -12,7 +12,6 @@ class SixUpLayout1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ExecuteAfterBuild().initializeSavedGame();
     return Row(
       children: [
         Expanded(

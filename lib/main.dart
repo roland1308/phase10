@@ -14,10 +14,7 @@ void main() {
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((value) => runApp(const MyApp()));
-
 }
-
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -28,7 +25,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Phase 10 points system',
       theme: ThemeData(
-        fontFamily: "Futura",
+          fontFamily: "Futura",
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
           scaffoldBackgroundColor: Colors.black),

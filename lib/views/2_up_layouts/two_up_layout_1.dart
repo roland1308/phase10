@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phase_10_points/utils/execute_after_build.dart';
+
 import 'package:phase_10_points/widgets/player_widget.dart';
 import 'package:phase_10_points/utils/players_divider.dart';
 
@@ -10,7 +10,6 @@ class TwoUpLayout1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ExecuteAfterBuild().initializeSavedGame();
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [

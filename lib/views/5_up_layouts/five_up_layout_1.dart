@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phase_10_points/widgets/player_widget.dart';
 import 'package:phase_10_points/utils/players_divider.dart';
 
-import '../../utils/execute_after_build.dart';
+
 
 class FiveUpLayout1 extends StatelessWidget {
   const FiveUpLayout1({
@@ -11,7 +11,6 @@ class FiveUpLayout1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ExecuteAfterBuild().initializeSavedGame();
     return Row(
       children: [
         Expanded(
