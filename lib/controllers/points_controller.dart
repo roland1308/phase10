@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:phase_10_points/utils/constants.dart';
@@ -21,7 +23,7 @@ class PointsController extends GetxController {
   final RxnBool _hasSaved = RxnBool();
 
   final RxInt _partialPoints = 0.obs;
-  RxBool showingPartial = false.obs;
+  final RxBool _showingPartial = false.obs;
 
   double get players => _players.value;
   int get selectedLayout => _selectedLayout.value;
@@ -31,44 +33,10 @@ class PointsController extends GetxController {
   List<int> get phases => _phases;
   int get partialPoints => _partialPoints.value;
   List<String> get names => _names;
+  bool get showingPartial => _showingPartial.value;
 
   late final SharedPreferences prefs;
-
-  changePointsState(int player, int x) {
-    _points[player] += x;
-    if (_points[player] < 0) {
-      _points[player] = 0;
-    } else {
-      showPartial(true);
-      updatePartial(x);
-    }
-
-    List<String> newPoints = _points.map((el) => el.toString()).toList();
-    prefs.setStringList("points", newPoints);
-    _points.refresh();
-  }
-
-  changePhase(int player, int x) {
-    _phases[player] += x;
-    if (_phases[player] == 0) _phases[player] = 1;
-    if (_phases[player] == 11) _phases[player] = 10;
-
-    List<String> newPhases = _phases.map((el) => el.toString()).toList();
-    prefs.setStringList("phases", newPhases);
-    _phases.refresh();
-  }
-
-  updatePartial(int x) {
-    _partialPoints.value += x;
-  }
-
-  resetPartial() {
-    _partialPoints.value = 0;
-  }
-
-  showPartial(bool status) {
-    showingPartial.value = status;
-  }
+  Timer? _hidePartial;
 
   @override
   void onInit() {
@@ -112,13 +80,50 @@ class PointsController extends GetxController {
     }
   }
 
+  changePointsState(int player, int x) {
+    resetPartial();
+    _points[player] += x;
+    if (_points[player] < 0) {
+      _points[player] = 0;
+    } else {
+      _showingPartial.value = true;
+      updatePartial(x);
+    }
+
+    List<String> newPoints = _points.map((el) => el.toString()).toList();
+    prefs.setStringList("points", newPoints);
+    _points.refresh();
+  }
+
+  changePhase(int player, int x) {
+    _phases[player] += x;
+    if (_phases[player] == 0) _phases[player] = 1;
+    if (_phases[player] == 11) _phases[player] = 10;
+
+    List<String> newPhases = _phases.map((el) => el.toString()).toList();
+    prefs.setStringList("phases", newPhases);
+    _phases.refresh();
+  }
+
+  updatePartial(int x) {
+    _partialPoints.value += x;
+  }
+
+  resetPartial() {
+    if (_hidePartial != null) _hidePartial!.cancel();
+    _hidePartial = Timer(const Duration(seconds: 1), () {
+      _showingPartial.value = false;
+      _partialPoints.value = 0;
+    });
+  }
+
   void setLayout(int newLayout) {
     _selectedLayout.value = newLayout;
     prefs.setInt("layout", newLayout);
   }
 
   void setName(int player, String newName) {
-    _names[player] = newName;
+    _names[player] = newName.toUpperCase();
     prefs.setStringList("names", _names);
     _names.refresh();
   }

@@ -45,18 +45,17 @@ class _ViewLayoutState extends State<ViewLayout> {
 
   Future<void> getNames() async {
     players = _pointsController.players.roundToDouble().toInt();
-    names = _pointsController.names.getRange(1,players+1).toList();
+    names = _pointsController.names.getRange(1, players + 1).toList();
   }
 
   /// Each time to start a speech recognition session
   void _startListening() async {
     getNames();
     await speechToText.listen(
-      onResult: _onSpeechResult,
-      listenFor: const Duration(seconds: 5),
-      partialResults: false,
-      localeId: "es"
-    );
+        onResult: _onSpeechResult,
+        listenFor: const Duration(seconds: 5),
+        partialResults: false,
+        localeId: "es");
     setState(() {});
   }
 
@@ -72,31 +71,55 @@ class _ViewLayoutState extends State<ViewLayout> {
   /// This is the callback that the SpeechToText plugin calls when
   /// the platform returns recognized words.
   void _onSpeechResult(SpeechRecognitionResult result) {
-    setState(() {
-
-    });
+    setState(() {});
     _lastWords = result.recognizedWords;
+    print(_lastWords);
     for (String str in _lastWords.split(" ")) {
       if (names.contains(str.toUpperCase())) {
         userToMark = str;
         break;
       }
     }
-    pointsToMark=(spanishWordsToNumber(_lastWords));
-      print("$userToMark somma $pointsToMark punti·");
+    pointsToMark = (spanishWordsToNumber(_lastWords));
+    if (userToMark != "" && pointsToMark > 0) {
+      int userIndex = _pointsController.names.indexOf(userToMark.toUpperCase());
+      _pointsController.changePointsState(userIndex, pointsToMark);
+    }
   }
 
   int spanishWordsToNumber(String words) {
     Map<String, int> units = {
-      'cero': 0, 'uno': 1, 'dos': 2, 'tres': 3, 'cuatro': 4, 'cinco': 5, 'seis': 6,
-      'siete': 7, 'ocho': 8, 'nueve': 9, 'diez': 10, 'once': 11, 'doce': 12,
-      'trece': 13, 'catorce': 14, 'quince': 15, 'dieciséis': 16, 'diecisiete': 17,
-      'dieciocho': 18, 'diecinueve': 19
+      'cero': 0,
+      'uno': 1,
+      'dos': 2,
+      'tres': 3,
+      'cuatro': 4,
+      'cinco': 5,
+      'seis': 6,
+      'siete': 7,
+      'ocho': 8,
+      'nueve': 9,
+      'diez': 10,
+      'once': 11,
+      'doce': 12,
+      'trece': 13,
+      'catorce': 14,
+      'quince': 15,
+      'dieciséis': 16,
+      'diecisiete': 17,
+      'dieciocho': 18,
+      'diecinueve': 19
     };
 
     Map<String, int> tens = {
-      'veinte': 20, 'treinta': 30, 'cuarenta': 40, 'cincuenta': 50, 'sesenta': 60,
-      'setenta': 70, 'ochenta': 80, 'noventa': 90
+      'veinte': 20,
+      'treinta': 30,
+      'cuarenta': 40,
+      'cincuenta': 50,
+      'sesenta': 60,
+      'setenta': 70,
+      'ochenta': 80,
+      'noventa': 90
     };
 
     List<String> wordsList = words.split(' ');
@@ -105,7 +128,7 @@ class _ViewLayoutState extends State<ViewLayout> {
     int currentNumber = 0;
 
     for (String word in wordsList) {
-      if(int.tryParse(word) == null) {
+      if (int.tryParse(word) == null) {
         if (units.containsKey(word)) {
           currentNumber += units[word]!;
         } else if (tens.containsKey(word)) {
@@ -120,8 +143,8 @@ class _ViewLayoutState extends State<ViewLayout> {
           currentNumber = 0;
         }
       } else {
-        number+=int.parse(word);
-        currentNumber=0;
+        number += int.parse(word);
+        currentNumber = 0;
       }
     }
 
@@ -130,10 +153,8 @@ class _ViewLayoutState extends State<ViewLayout> {
     return number;
   }
 
-
   @override
   Widget build(BuildContext context) {
-    print(speechToText.isListening);
     return GestureDetector(
       onVerticalDragUpdate: (details) {
         if (details.delta.dy > 0) {
@@ -166,7 +187,7 @@ class _ViewLayoutState extends State<ViewLayout> {
               alignment: AlignmentDirectional.center,
               children: [
                 widget.schema.layoutWidgets[widget.layout],
-                if (_pointsController.showingPartial.value)
+                if (_pointsController.showingPartial)
                   Positioned(
                     top: 10,
                     child: CircleAvatar(
@@ -180,8 +201,13 @@ class _ViewLayoutState extends State<ViewLayout> {
                     ),
                   ),
                 if (_isResultVisible)
-                  Container(
-                    color: Colors.black.withOpacity(.5),
+                  GestureDetector(
+                    onTap: () => setState(() {
+                      _isResultVisible = false;
+                    }),
+                    child: Container(
+                      color: Colors.black.withOpacity(.5),
+                    ),
                   ),
                 Leaderboard(isResultVisible: _isResultVisible),
               ],
