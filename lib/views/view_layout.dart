@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phase_10_points/utils/constants.dart';
@@ -18,7 +19,10 @@ class ViewLayout extends StatefulWidget {
 }
 
 class _ViewLayoutState extends State<ViewLayout> {
+
   SpeechToText speechToText = SpeechToText();
+  final player = AudioPlayer();
+
   bool _speechEnabled = false;
   String _lastWords = '';
 
@@ -70,9 +74,11 @@ class _ViewLayoutState extends State<ViewLayout> {
 
   /// This is the callback that the SpeechToText plugin calls when
   /// the platform returns recognized words.
-  void _onSpeechResult(SpeechRecognitionResult result) {
+  Future<void> _onSpeechResult(SpeechRecognitionResult result) async {
     setState(() {});
     _lastWords = result.recognizedWords;
+    bool _hasFound = false;
+
     _isPhase = _lastWords.contains("phase") || _lastWords.contains("fase");
     for (String str in _lastWords.split(" ")) {
       if (_names.contains(str.toUpperCase())) {
@@ -85,13 +91,18 @@ class _ViewLayoutState extends State<ViewLayout> {
       int userIndex = _pointsController.names.indexOf(_userToMark.toUpperCase());
       if (_isPhase) {
         _pointsController.changePhase(userIndex, 1);
+        _hasFound = true;
       }
       else {
         _pointsToMark = (spanishWordsToNumber(_lastWords));
         if (_pointsToMark > 0) {
           _pointsController.changePointsState(userIndex, _pointsToMark);
+          _hasFound = true;
         }
       }
+    }
+    if(!_hasFound) {
+      await player.play(AssetSource('wrong-buzzer-6268.mp3'));
     }
   }
 
