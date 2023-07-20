@@ -4,6 +4,10 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:phase_10_points/views/home_page.dart';
 
+import 'controllers/players_name_controller.dart';
+import 'controllers/points_controller.dart';
+import 'controllers/speech_controller.dart';
+
 void main() {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -21,6 +25,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(PointsController());
+    Get.put(PlayersNameController());
+    Get.put(SpeechController());
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Phase 10 points system',

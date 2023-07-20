@@ -1,6 +1,9 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:phase_10_points/controllers/text_to_speech_controller.dart';
 
+import '../controllers/audio_controller.dart';
 import '../controllers/points_controller.dart';
 
 class Leaderboard extends StatefulWidget {
@@ -16,18 +19,20 @@ class Leaderboard extends StatefulWidget {
 }
 
 class _LeaderboardState extends State<Leaderboard> {
-
   final PointsController _pointsController = Get.find();
+  final AudioController _audioController = AudioController();
   int players = 0;
   List<int> points = [];
   List<int> phases = [];
   List<String> names = [];
 
+  late var listenPlayer;
+
   getResults() {
-      players = (_pointsController.players.roundToDouble()).toInt();
-      points = (_pointsController.points).getRange(1,players+1).toList();
-      phases = (_pointsController.phases).getRange(1,players+1).toList();
-      names = (_pointsController.names).getRange(1,players+1).toList();
+    players = (_pointsController.players.roundToDouble()).toInt();
+    points = (_pointsController.points).getRange(1, players + 1).toList();
+    phases = (_pointsController.phases).getRange(1, players + 1).toList();
+    names = (_pointsController.names).getRange(1, players + 1).toList();
 
     List<int> indices = List.generate(points.length, (index) => index);
 
@@ -36,8 +41,7 @@ class _LeaderboardState extends State<Leaderboard> {
       if (pointsComparison != 0) {
         return pointsComparison;
       } else {
-        return phases[b].compareTo(
-            phases[a]);
+        return phases[b].compareTo(phases[a]);
       }
     });
 
@@ -52,8 +56,15 @@ class _LeaderboardState extends State<Leaderboard> {
     if (widget._isResultVisible != oldWidget._isResultVisible) {
       if (widget._isResultVisible) {
         getResults();
+        _audioController.playSound('the_winner_is.mp3');
       }
     }
+  }
+
+  @override
+  void initState() {
+    initSpeech();
+    super.initState();
   }
 
   @override
@@ -120,6 +131,16 @@ class _LeaderboardState extends State<Leaderboard> {
       allResults.add(SingleResult(i, points[i], names[i], phases[i]));
     }
     return Column(children: allResults);
+  }
+
+  Future<void> initSpeech() async {
+    listenPlayer = _audioController.audioPlayer.onPlayerStateChanged.listen((it) {
+      if (it == PlayerState.completed) {
+        final TextToSpeechController textToSpeechController =
+        TextToSpeechController();
+        textToSpeechController.speak(names[0]);
+      }
+    });
   }
 }
 

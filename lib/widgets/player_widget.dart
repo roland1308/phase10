@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:phase_10_points/controllers/players_name_controller.dart';
 import 'package:phase_10_points/controllers/points_controller.dart';
 
+import '../controllers/speech_controller.dart';
 import '../utils/constants.dart';
 
 class PlayerWidget extends StatefulWidget {
@@ -30,7 +31,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   final TextEditingController _nameController = TextEditingController(text: "");
 
   final PointsController _pointsController = Get.find();
-  final _playersNameController = Get.put(PlayersNameController());
+  final PlayersNameController _playersNameController = Get.find();
+  final SpeechController _speechController = Get.find();
 
   void startSum(int x) {
     _autoPoints = Timer.periodic(const Duration(milliseconds: 500), (timer) {
@@ -149,21 +151,32 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     color: kPlayersColors[widget.player], fontSize: 25),
               ),
             ),
-            Text(
-              "Phase:  ",
-              style:
-                  TextStyle(color: kPlayersColors[widget.player], fontSize: 17),
-            ),
-            AnimatedFlipCounter(
-              value: _pointsController.phases[widget.player],
-              prefix: _pointsController.phases[widget.player].toInt() < 10
-                  ? "0"
-                  : null,
-              textStyle: TextStyle(
-                fontSize: 20,
-                color: kPlayersColors[widget.player],
-              ),
-            ),
+            _pointsController.isClosingPhase10[widget.player]
+                ? GestureDetector(
+              onTap: ()=> _pointsController.setIsLeaderboardShowed(true),
+                  child: Text("CERRAR", style:TextStyle(
+                  color: kPlayersColors[widget.player], fontSize: 17),),
+                )
+                : Row(
+                    children: [
+                      Text(
+                        "Phase: ",
+                        style: TextStyle(
+                            color: kPlayersColors[widget.player], fontSize: 17),
+                      ),
+                      AnimatedFlipCounter(
+                        value: _pointsController.phases[widget.player],
+                        prefix:
+                            _pointsController.phases[widget.player].toInt() < 10
+                                ? "0"
+                                : null,
+                        textStyle: TextStyle(
+                          fontSize: 20,
+                          color: kPlayersColors[widget.player],
+                        ),
+                      ),
+                    ],
+                  ),
             GestureDetector(
               onTap: () => _pointsController.changePhase(widget.player, 1),
               child: Text(
@@ -208,27 +221,38 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     )
                 ],
               ),
-              TextField(
-                style: const TextStyle(fontSize: 23),
-                autofocus: true,
-                controller: _nameController,
-                onTapOutside: (_) {
-                  if (_nameController.text != "" &&
-                      !_playersNameController
+              GetX<SpeechController>(builder: (context) {
+                _nameController.text = _pointsController.names[widget.player];
+                return TextField(
+                  style: const TextStyle(fontSize: 23),
+                  autofocus: true,
+                  controller: _nameController,
+                  onTapOutside: (_) {
+                    if (_nameController.text != "" &&
+                        !_nameController.text.contains("JUGADOR")) {
+                      _pointsController.setName(
+                          widget.player, _nameController.text.trim());
+                      if (!_playersNameController
                           .contains(_nameController.text.trim())) {
-                    _playersNameController.addUser(_nameController.text.trim());
-                  }
-                },
-                onChanged: (value) async {
-                  if (value == "") {
-                    value = "JUGADOR ${widget.player}";
-                  }
-                  _pointsController.setName(widget.player, value.trim());
-                },
-                decoration: const InputDecoration(
-                  hintText: "Nombre jugador",
-                ),
-              ),
+                        _playersNameController
+                            .addUser(_nameController.text.trim());
+                      }
+                    }
+                  },
+                  decoration: InputDecoration(
+                    suffixIcon: GestureDetector(
+                      onTap: () => _speechController.isListening()
+                          ? _speechController.stopListening
+                          : _speechController.startListening(
+                              player: widget.player),
+                      child: Icon(_speechController.isListening()
+                          ? Icons.mic
+                          : Icons.mic_off),
+                    ),
+                    hintText: "Nombre jugador",
+                  ),
+                );
+              }),
             ],
           ),
         );

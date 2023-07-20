@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:phase_10_points/controllers/speech_controller.dart';
 import 'package:phase_10_points/views/instructions.dart';
 import 'package:phase_10_points/views/view_layout.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/foundation.dart';
 
+import '../controllers/players_name_controller.dart';
 import '../controllers/points_controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,8 +21,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _pointsController = Get.put(PointsController());
-
+  final PointsController _pointsController = Get.find();
   bool _visible = true;
 
   @override
@@ -97,12 +98,16 @@ class _HomePageState extends State<HomePage> {
                     ),
                     if (_pointsController.hasSaved ?? false)
                       ElevatedButton(
-                        onPressed: () => goToLayout(),
+                        onPressed: () {
+                          _pointsController.checkSaved();
+                          goToLayout();
+                        },
                         child: const Center(
                             child: Text("CONTINUA JUEGO GUARDADO")),
                       ),
                     ElevatedButton(
                       onPressed: () {
+                        _pointsController.setGameInPrefs();
                         _pointsController.reset();
                         goToLayout();
                       },

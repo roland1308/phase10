@@ -18,12 +18,17 @@ class PointsController extends GetxController {
     "JUGADOR 5",
     "JUGADOR 6"
   ].obs;
+  final RxnBool _hasSaved = RxnBool();
+
   final RxList<int> _points = <int>[-1, 0, 0, 0, 0, 0, 0].obs;
   final RxList<int> _phases = <int>[-1, 1, 1, 1, 1, 1, 1].obs;
-  final RxnBool _hasSaved = RxnBool();
+  final RxList<bool> _isClosingPhase10 =
+      <bool>[false, false, false, false, false, false, false].obs;
 
   final RxInt _partialPoints = 0.obs;
   final RxBool _showingPartial = false.obs;
+
+  final RxBool _isLeaderBoardShowed = false.obs;
 
   double get players => _players.value;
   int get selectedLayout => _selectedLayout.value;
@@ -34,6 +39,8 @@ class PointsController extends GetxController {
   int get partialPoints => _partialPoints.value;
   List<String> get names => _names;
   bool get showingPartial => _showingPartial.value;
+  List<bool> get isClosingPhase10 => _isClosingPhase10;
+  bool get isLeaderBoardShowed => _isLeaderBoardShowed.value;
 
   late final SharedPreferences prefs;
   Timer? _hidePartial;
@@ -42,6 +49,10 @@ class PointsController extends GetxController {
   void onInit() {
     checkSaved();
     super.onInit();
+  }
+
+  setIsLeaderboardShowed(bool value) {
+    _isLeaderBoardShowed.value = value;
   }
 
   void checkSaved() async {
@@ -96,9 +107,13 @@ class PointsController extends GetxController {
   }
 
   changePhase(int player, int x) {
+    _isClosingPhase10[player] = false;
     _phases[player] += x;
     if (_phases[player] == 0) _phases[player] = 1;
-    if (_phases[player] == 11) _phases[player] = 10;
+    if (_phases[player] >= 11) {
+      _phases[player] = 10;
+      _isClosingPhase10[player] = true;
+    }
 
     List<String> newPhases = _phases.map((el) => el.toString()).toList();
     prefs.setStringList("phases", newPhases);
@@ -119,7 +134,7 @@ class PointsController extends GetxController {
 
   void setLayout(int newLayout) {
     _selectedLayout.value = newLayout;
-    prefs.setInt("layout", newLayout);
+    //prefs.setInt("layout", newLayout);
   }
 
   void setName(int player, String newName) {
@@ -132,8 +147,13 @@ class PointsController extends GetxController {
     _players.value = newPlayers;
     setLayout(newSelectedLayout);
 
-    prefs.setDouble("players", newPlayers);
+    //prefs.setDouble("players", newPlayers);
     _schema.value = SchemasEnum.values[newPlayers.toInt() - 2];
+  }
+
+  void setGameInPrefs() {
+    prefs.setInt("layout", _selectedLayout.value);
+    prefs.setDouble("players", _players.value);
   }
 
   void setNewGame(double newPlayers, int newSelectedLayout) {
