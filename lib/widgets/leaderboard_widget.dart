@@ -30,9 +30,9 @@ class _LeaderboardState extends State<Leaderboard> {
 
   getResults() {
     players = (_pointsController.players.roundToDouble()).toInt();
-    points = (_pointsController.points).getRange(1, players + 1).toList();
-    phases = (_pointsController.phases).getRange(1, players + 1).toList();
-    names = (_pointsController.names).getRange(1, players + 1).toList();
+    points = (_pointsController.allPoints).getRange(1, players + 1).toList();
+    phases = (_pointsController.allPhases).getRange(1, players + 1).toList();
+    names = (_pointsController.allNames).getRange(1, players + 1).toList();
 
     List<int> indices = List.generate(points.length, (index) => index);
 

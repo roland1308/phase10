@@ -80,7 +80,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     Center(
                       child: FittedBox(
                         child: AnimatedFlipCounter(
-                          value: _pointsController.points[widget.player],
+                          value: _pointsController.newPlayers[widget.player].points,
                           textStyle: TextStyle(
                             fontSize: 100,
                             color: kPlayersColors[widget.player],
@@ -124,7 +124,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 _changeName(context);
               },
               child: Text(
-                _pointsController.names[widget.player].toUpperCase(),
+                _pointsController.newPlayers[widget.player].name.toUpperCase(),
                 style: TextStyle(
                     color: kPlayersColors[widget.player],
                     fontSize: 20,
@@ -151,7 +151,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     color: kPlayersColors[widget.player], fontSize: 25),
               ),
             ),
-            _pointsController.isClosingPhase10[widget.player]
+            _pointsController.newPlayers[widget.player].isClosingPhase10
                 ? GestureDetector(
               onTap: ()=> _pointsController.setIsLeaderboardShowed(true),
                   child: Text("CERRAR", style:TextStyle(
@@ -165,9 +165,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                             color: kPlayersColors[widget.player], fontSize: 17),
                       ),
                       AnimatedFlipCounter(
-                        value: _pointsController.phases[widget.player],
+                        value: _pointsController.newPlayers[widget.player].phase,
                         prefix:
-                            _pointsController.phases[widget.player].toInt() < 10
+                            _pointsController.newPlayers[widget.player].phase.toInt() < 10
                                 ? "0"
                                 : null,
                         textStyle: TextStyle(
@@ -222,7 +222,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 ],
               ),
               GetX<SpeechController>(builder: (context) {
-                _nameController.text = _pointsController.names[widget.player];
+                _nameController.text = _pointsController.newPlayers[widget.player].name;
                 return TextField(
                   style: const TextStyle(fontSize: 23),
                   autofocus: true,

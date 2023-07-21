@@ -82,7 +82,7 @@ class SpeechController extends GetxController {
 
     if (_userToMark != "") {
       int userIndex =
-          _pointsController.names.indexOf(_userToMark.toUpperCase());
+          _pointsController.allNames.indexOf(_userToMark.toUpperCase());
       if (_isPhase) {
         _pointsController.changePhase(userIndex, 1);
         hasFound = true;
@@ -108,7 +108,7 @@ class SpeechController extends GetxController {
 
   void _getNames() {
     _players = _pointsController.players.roundToDouble().toInt();
-    _names = _pointsController.names.getRange(1, _players + 1).toList();
+    _names = _pointsController.allNames.getRange(1, _players + 1).toList();
   }
 
   int _spanishWordsToNumber(String words) {

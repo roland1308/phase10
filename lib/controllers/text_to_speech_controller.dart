@@ -6,6 +6,7 @@ class TextToSpeechController {
   final _flutterTts = FlutterTts();
   TextToSpeechController() {
     _flutterTts.setLanguage("es-ES");
+    _flutterTts.setVolume(1.0);
 /*
     if (!kIsWeb && Platform.isAndroid) {
       _flutterTts.setEngine("com.google.android.tts");

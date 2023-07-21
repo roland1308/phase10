@@ -1,29 +1,40 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:phase_10_points/controllers/shared_preferences_controller.dart';
 import 'package:phase_10_points/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/player_model.dart';
+
 class PointsController extends GetxController {
+  final SharedPref _sharedPref = SharedPref();
+
+  List<Player> initialPlayers = List.generate(
+    7,
+    (index) => Player(
+      name: "JUGADOR $index",
+      points: 0,
+      phase: 0,
+      isClosingPhase10: false,
+    ),
+  );
+  final RxList<Player> _newPlayers = List.generate(
+    7,
+    (index) => Player(
+      name: "JUGADOR $index",
+      points: 0,
+      phase: 0,
+      isClosingPhase10: false,
+    ),
+  ).obs;
+
   final RxDouble _players = 2.0.obs;
   final RxInt _selectedLayout = 1.obs;
   final Rx<SchemasEnum> _schema = SchemasEnum.up_2.obs;
-  final RxList<String> _names = <String>[
-    "nn",
-    "JUGADOR 1",
-    "JUGADOR 2",
-    "JUGADOR 3",
-    "JUGADOR 4",
-    "JUGADOR 5",
-    "JUGADOR 6"
-  ].obs;
   final RxnBool _hasSaved = RxnBool();
-
-  final RxList<int> _points = <int>[-1, 0, 0, 0, 0, 0, 0].obs;
-  final RxList<int> _phases = <int>[-1, 1, 1, 1, 1, 1, 1].obs;
-  final RxList<bool> _isClosingPhase10 =
-      <bool>[false, false, false, false, false, false, false].obs;
 
   final RxInt _partialPoints = 0.obs;
   final RxBool _showingPartial = false.obs;
@@ -34,15 +45,17 @@ class PointsController extends GetxController {
   int get selectedLayout => _selectedLayout.value;
   SchemasEnum get schema => _schema.value;
   bool? get hasSaved => _hasSaved.value;
-  List<int> get points => _points;
-  List<int> get phases => _phases;
   int get partialPoints => _partialPoints.value;
-  List<String> get names => _names;
   bool get showingPartial => _showingPartial.value;
-  List<bool> get isClosingPhase10 => _isClosingPhase10;
   bool get isLeaderBoardShowed => _isLeaderBoardShowed.value;
+  List<Player> get newPlayers => _newPlayers;
 
-  late final SharedPreferences prefs;
+  List<String> get allNames =>
+      _newPlayers.map((player) => player.name).toList();
+  List<int> get allPoints =>
+      _newPlayers.map((player) => player.points).toList();
+  List<int> get allPhases => _newPlayers.map((player) => player.phase).toList();
+
   Timer? _hidePartial;
 
   @override
@@ -56,68 +69,47 @@ class PointsController extends GetxController {
   }
 
   void checkSaved() async {
-    try {
-      prefs = await SharedPreferences.getInstance();
-    } catch (_) {}
-    _hasSaved.value = false;
-    if (prefs.containsKey("savedGame")) {
-      List<String> prefPoints = prefs.getStringList("points")!;
-      List<String> prefPhases = prefs.getStringList("phases")!;
-      List<String> prefNames = prefs.getStringList("names")!;
+    _hasSaved.value = await _sharedPref.hasSaved();
+    if (_hasSaved.value ?? false) {
+      List<Player> prefPlayers = await _sharedPref.readToList("newplayers");
 
-      _players.value = prefs.getDouble("players") ?? 2;
-      _selectedLayout.value = prefs.getInt("layout") ?? 1;
+      _players.value = await _sharedPref.read("players") ?? 2.0;
+      _selectedLayout.value = await _sharedPref.read("layout") ?? 1;
       _schema.value = SchemasEnum.values[_players.value.toInt() - 2];
 
-      bool points =
-          listEquals(prefPoints, ["-1", "0", "0", "0", "0", "0", "0"]);
-      bool phases =
-          listEquals(prefPhases, ["-1", "1", "1", "1", "1", "1", "1"]);
-      bool names = listEquals(prefNames, [
-        "nn",
-        "JUGADOR 1",
-        "JUGADOR 2",
-        "JUGADOR 3",
-        "JUGADOR 4",
-        "JUGADOR 5",
-        "JUGADOR 6"
-      ]);
-      _hasSaved.value = !points || !phases || !names;
+      _hasSaved.value = !arePlayerListsEqual(prefPlayers, initialPlayers);
       if (_hasSaved.value ?? false) {
-        _points.value = prefPoints.map((el) => int.parse(el)).toList();
-        _phases.value = prefPhases.map((el) => int.parse(el)).toList();
-        _names.value = prefNames;
+        _newPlayers.value = prefPlayers;
       }
     }
+    _hasSaved.refresh();
   }
 
   changePointsState(int player, int x) {
     resetPartial();
-    _points[player] += x;
-    if (_points[player] < 0) {
-      _points[player] = 0;
+    _newPlayers[player].points += x;
+    if (_newPlayers[player].points < 0) {
+      _newPlayers[player].points += 0;
     } else {
       _showingPartial.value = true;
       updatePartial(x);
     }
 
-    List<String> newPoints = _points.map((el) => el.toString()).toList();
-    prefs.setStringList("points", newPoints);
-    _points.refresh();
+    _sharedPref.save("newplayers", _newPlayers);
+    _newPlayers.refresh();
   }
 
   changePhase(int player, int x) {
-    _isClosingPhase10[player] = false;
-    _phases[player] += x;
-    if (_phases[player] == 0) _phases[player] = 1;
-    if (_phases[player] >= 11) {
-      _phases[player] = 10;
-      _isClosingPhase10[player] = true;
+    _newPlayers[player].isClosingPhase10 = false;
+    _newPlayers[player].phase += x;
+    if (_newPlayers[player].phase == 0) _newPlayers[player].phase = 1;
+    if (_newPlayers[player].phase >= 11) {
+      _newPlayers[player].phase = 10;
+      _newPlayers[player].isClosingPhase10 = true;
     }
 
-    List<String> newPhases = _phases.map((el) => el.toString()).toList();
-    prefs.setStringList("phases", newPhases);
-    _phases.refresh();
+    _sharedPref.save("newplayers", _newPlayers);
+    _newPlayers.refresh();
   }
 
   updatePartial(int x) {
@@ -138,9 +130,9 @@ class PointsController extends GetxController {
   }
 
   void setName(int player, String newName) {
-    _names[player] = newName.toUpperCase();
-    prefs.setStringList("names", _names);
-    _names.refresh();
+    _newPlayers[player].name = newName.toUpperCase();
+    _sharedPref.save("newplayers", _newPlayers);
+    _newPlayers.refresh();
   }
 
   void setGame(double newPlayers, int newSelectedLayout) {
@@ -152,43 +144,38 @@ class PointsController extends GetxController {
   }
 
   void setGameInPrefs() {
-    prefs.setInt("layout", _selectedLayout.value);
-    prefs.setDouble("players", _players.value);
+    _sharedPref.save("layout", _selectedLayout.value);
+    _sharedPref.save("players", _players.value);
   }
 
   void setNewGame(double newPlayers, int newSelectedLayout) {
     _players.value = newPlayers;
     _selectedLayout.value = newSelectedLayout;
 
-    prefs.setDouble("players", newPlayers);
-    prefs.setInt("layout", newSelectedLayout);
-    prefs.remove("savedGame");
+    _sharedPref.save("players", newPlayers);
+    _sharedPref.save("layout", newSelectedLayout);
+    _sharedPref.remove("savedGame");
   }
 
   void reset() {
-    _names.value = <String>[
-      "nn",
-      "JUGADOR 1",
-      "JUGADOR 2",
-      "JUGADOR 3",
-      "JUGADOR 4",
-      "JUGADOR 5",
-      "JUGADOR 6"
-    ];
-    _points.value = <int>[-1, 0, 0, 0, 0, 0, 0];
-    _phases.value = <int>[-1, 1, 1, 1, 1, 1, 1];
+    _newPlayers.value = List.generate(
+      7,
+      (index) => Player(
+        name: "JUGADOR $index",
+        points: 0,
+        phase: 0,
+        isClosingPhase10: false,
+      ),
+    );
+    _sharedPref.save("savedGame", true);
+    _sharedPref.save("newplayers", initialPlayers);
+    _newPlayers.refresh();
+  }
 
-    prefs.setBool("savedGame", true);
-    prefs.setStringList("points", ["-1", "0", "0", "0", "0", "0", "0"]);
-    prefs.setStringList("phases", ["-1", "1", "1", "1", "1", "1", "1"]);
-    prefs.setStringList("names", [
-      "nn",
-      "JUGADOR 1",
-      "JUGADOR 2",
-      "JUGADOR 3",
-      "JUGADOR 4",
-      "JUGADOR 5",
-      "JUGADOR 6"
-    ]);
+  bool arePlayerListsEqual(List<Player> list1, List<Player> list2) {
+    if (jsonEncode(list1) == jsonEncode(list2)) {
+      return true;
+    }
+    return false;
   }
 }
