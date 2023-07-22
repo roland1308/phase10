@@ -19,35 +19,38 @@ class Leaderboard extends StatefulWidget {
 }
 
 class _LeaderboardState extends State<Leaderboard> {
+
   final PointsController _pointsController = Get.find();
   final AudioController _audioController = AudioController();
-  int players = 0;
-  List<int> points = [];
-  List<int> phases = [];
-  List<String> names = [];
+  final TextToSpeechController _textToSpeechController = TextToSpeechController();
 
-  late var listenPlayer;
+  int _players = 0;
+  List<int> _points = [];
+  List<int> _phases = [];
+  List<String> _names = [];
+
+  late var _listenPlayer;
 
   getResults() {
-    players = (_pointsController.players.roundToDouble()).toInt();
-    points = (_pointsController.allPoints).getRange(1, players + 1).toList();
-    phases = (_pointsController.allPhases).getRange(1, players + 1).toList();
-    names = (_pointsController.allNames).getRange(1, players + 1).toList();
+    _players = (_pointsController.players.roundToDouble()).toInt();
+    _points = (_pointsController.allPoints).getRange(1, _players + 1).toList();
+    _phases = (_pointsController.allPhases).getRange(1, _players + 1).toList();
+    _names = (_pointsController.allNames).getRange(1, _players + 1).toList();
 
-    List<int> indices = List.generate(points.length, (index) => index);
+    List<int> indices = List.generate(_points.length, (index) => index);
 
     indices.sort((a, b) {
-      int pointsComparison = points[a].compareTo(points[b]);
+      int pointsComparison = _points[a].compareTo(_points[b]);
       if (pointsComparison != 0) {
         return pointsComparison;
       } else {
-        return phases[b].compareTo(phases[a]);
+        return _phases[b].compareTo(_phases[a]);
       }
     });
 
-    points = indices.map((index) => points[index]).toList();
-    phases = indices.map((index) => phases[index]).toList();
-    names = indices.map((index) => names[index]).toList();
+    _points = indices.map((index) => _points[index]).toList();
+    _phases = indices.map((index) => _phases[index]).toList();
+    _names = indices.map((index) => _names[index]).toList();
   }
 
   @override
@@ -56,7 +59,11 @@ class _LeaderboardState extends State<Leaderboard> {
     if (widget._isResultVisible != oldWidget._isResultVisible) {
       if (widget._isResultVisible) {
         getResults();
-        _audioController.playSound('the_winner_is.mp3');
+        if (_pointsController.isGameEnded){
+          _audioController.playSound('the_winner_is.mp3');
+        } else {
+          _textToSpeechController.speak("Está ganando ${_names[0]}");
+        }
       }
     }
   }
@@ -118,7 +125,7 @@ class _LeaderboardState extends State<Leaderboard> {
                   fontWeight: FontWeight.bold),
             ),
           ),
-          if (players > 0) createResults(),
+          if (_players > 0) createResults(),
           const SizedBox(height: 20)
         ]),
       ),
@@ -127,18 +134,16 @@ class _LeaderboardState extends State<Leaderboard> {
 
   Column createResults() {
     List<Widget> allResults = [];
-    for (int i = 0; i < players; i++) {
-      allResults.add(SingleResult(i, points[i], names[i], phases[i]));
+    for (int i = 0; i < _players; i++) {
+      allResults.add(SingleResult(i, _points[i], _names[i], _phases[i]));
     }
     return Column(children: allResults);
   }
 
   Future<void> initSpeech() async {
-    listenPlayer = _audioController.audioPlayer.onPlayerStateChanged.listen((it) {
-      if (it == PlayerState.completed) {
-        final TextToSpeechController textToSpeechController =
-        TextToSpeechController();
-        textToSpeechController.speak(names[0]);
+    _listenPlayer = _audioController.audioPlayer.onPlayerStateChanged.listen((status) {
+      if (status == PlayerState.completed) {
+        _textToSpeechController.speak(_names[0]);
       }
     });
   }

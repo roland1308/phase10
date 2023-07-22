@@ -1,16 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:phase_10_points/controllers/shared_preferences_controller.dart';
 import 'package:phase_10_points/utils/constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/player_model.dart';
 
 class PointsController extends GetxController {
-  final SharedPref _sharedPref = SharedPref();
+  final SharedPrefController _sharedPref = SharedPrefController();
 
   List<Player> initialPlayers = List.generate(
     7,
@@ -40,6 +38,7 @@ class PointsController extends GetxController {
   final RxBool _showingPartial = false.obs;
 
   final RxBool _isLeaderBoardShowed = false.obs;
+  final RxBool _isGameEnded = false.obs;
 
   double get players => _players.value;
   int get selectedLayout => _selectedLayout.value;
@@ -48,6 +47,7 @@ class PointsController extends GetxController {
   int get partialPoints => _partialPoints.value;
   bool get showingPartial => _showingPartial.value;
   bool get isLeaderBoardShowed => _isLeaderBoardShowed.value;
+  bool get isGameEnded => _isGameEnded.value;
   List<Player> get newPlayers => _newPlayers;
 
   List<String> get allNames =>
@@ -66,6 +66,11 @@ class PointsController extends GetxController {
 
   setIsLeaderboardShowed(bool value) {
     _isLeaderBoardShowed.value = value;
+  }
+
+  setIsGameEnded(bool value) {
+    _isGameEnded.value = value;
+    _isLeaderBoardShowed.value = true;
   }
 
   void checkSaved() async {

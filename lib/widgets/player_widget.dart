@@ -153,7 +153,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             ),
             _pointsController.newPlayers[widget.player].isClosingPhase10
                 ? GestureDetector(
-              onTap: ()=> _pointsController.setIsLeaderboardShowed(true),
+              onTap: ()=> _pointsController.setIsGameEnded(true),
                   child: Text("CERRAR", style:TextStyle(
                   color: kPlayersColors[widget.player], fontSize: 17),),
                 )
