@@ -5,6 +5,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:phase_10_points/controllers/speech_controller.dart';
+import 'package:phase_10_points/controllers/text_to_speech_controller.dart';
 import 'package:phase_10_points/views/instructions.dart';
 import 'package:phase_10_points/views/view_layout.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -21,12 +22,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   final PointsController _pointsController = Get.find();
+  final TextToSpeechController _textToSpeechController = TextToSpeechController();
+
   bool _visible = true;
 
   @override
   void initState() {
     super.initState();
+    _textToSpeechController.speak("Bienvenidos!");
     if (!kIsWeb) {
       sleep(const Duration(milliseconds: 500));
     }

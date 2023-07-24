@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    precacheImage(const AssetImage("assets/phase_10.png"), context);
     Get.put(PointsController());
     Get.put(PlayersNameController());
     Get.put(SpeechController());

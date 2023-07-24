@@ -13,7 +13,7 @@ class SpeechController extends GetxController {
 
   String _lastWords = '';
   int _players = 0;
-  List<String> _names = [];
+  List<String> _namesInGame = [];
   String _userToMark = "";
   int _pointsToMark = 0;
   bool _isPhase = false;
@@ -74,15 +74,15 @@ class SpeechController extends GetxController {
 
     _isPhase = _lastWords.contains("phase") || _lastWords.contains("fase");
     for (String str in _lastWords.split(" ")) {
-      if (_names.contains(str.toUpperCase())) {
-        _userToMark = str;
+      if (_namesInGame.contains(str.toUpperCase())) {
+        _userToMark = str.toUpperCase();
         break;
       }
     }
 
     if (_userToMark != "") {
       int userIndex =
-          _pointsController.allNames.indexOf(_userToMark.toUpperCase());
+          _pointsController.allNames.indexOf(_userToMark);
       if (_isPhase) {
         _pointsController.changePhase(userIndex, 1);
         hasFound = true;
@@ -108,7 +108,7 @@ class SpeechController extends GetxController {
 
   void _getNames() {
     _players = _pointsController.players.roundToDouble().toInt();
-    _names = _pointsController.allNames.getRange(1, _players + 1).toList();
+    _namesInGame = _pointsController.allNames.getRange(1, _players + 1).toList();
   }
 
   int _spanishWordsToNumber(String words) {
