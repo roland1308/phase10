@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import '../models/player_model.dart';
 
-class SharedPrefController {
+class SharedPrefService {
 
   Future<bool> hasSaved() async {
     final prefs = await SharedPreferences.getInstance();

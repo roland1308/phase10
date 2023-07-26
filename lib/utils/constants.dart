@@ -13,12 +13,18 @@ import 'package:phase_10_points/views/6_up_layouts/six_up_layout_2.dart';
 
 const List<Color> kPlayersColors = [
   Colors.white,
-  Colors.purple,
-  Colors.indigoAccent,
+  Colors.red,
+  Colors.blue,
   Colors.green,
-  Colors.amberAccent,
-  Colors.deepOrangeAccent,
-  Colors.cyanAccent
+  Color.fromRGBO(168, 102, 0, 1.0),
+  Colors.purple,
+  Color.fromRGBO(0, 63, 57, 1.0),
+  Colors.amber,
+  Colors.indigo,
+  Color.fromRGBO(152, 0, 0, 1.0),
+  Colors.cyan,
+  Colors.yellow,
+  Colors.deepOrange,
 ];
 
 enum SchemasEnum {

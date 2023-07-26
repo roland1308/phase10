@@ -10,24 +10,21 @@ class TwoUpLayout1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double maxWidth = MediaQuery.of(context).size.height / 2;
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
           child: RotatedBox(
             quarterTurns: 1,
-            child: PlayerWidget(
-                player: 1,
-                maxWidth: MediaQuery.of(context).size.height / 2),
+            child: PlayerWidget(player: 1, maxWidth: maxWidth),
           ),
         ),
         const PlayersDivider(),
         Expanded(
           child: RotatedBox(
             quarterTurns: -1,
-            child: PlayerWidget(
-                player: 2,
-                maxWidth: MediaQuery.of(context).size.height / 2),
+            child: PlayerWidget(player: 2, maxWidth: maxWidth),
           ),
         ),
       ],

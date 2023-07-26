@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:phase_10_points/controllers/players_name_controller.dart';
+import 'package:phase_10_points/controllers/last_players_name_controller.dart';
 import 'package:phase_10_points/controllers/points_controller.dart';
 
-import '../controllers/speech_controller.dart';
+import '../services/speech_service.dart';
 import '../utils/constants.dart';
 
-class PlayerWidget extends StatefulWidget {
+class PlayerWidget extends StatelessWidget {
   final PointsController pointsController = Get.find();
 
   final double maxWidth;
@@ -21,22 +21,19 @@ class PlayerWidget extends StatefulWidget {
     required this.player,
   });
 
-  @override
-  State<PlayerWidget> createState() => _PlayerWidgetState();
-}
-
-class _PlayerWidgetState extends State<PlayerWidget> {
   Timer? _autoPoints;
 
   final TextEditingController _nameController = TextEditingController(text: "");
 
   final PointsController _pointsController = Get.find();
-  final PlayersNameController _playersNameController = Get.find();
+  final LastPlayersNameController _playersNameController = Get.find();
   final SpeechController _speechController = Get.find();
+
+  Color _playerColor = Colors.white;
 
   void startSum(int x) {
     _autoPoints = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      _pointsController.changePointsState(widget.player, x);
+      _pointsController.changePointsState(player, x);
     });
   }
 
@@ -45,90 +42,101 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Stack(
       alignment: AlignmentDirectional.center,
       children: [
-        Row(
-          children: [
-            SizedBox(
-              width: widget.maxWidth / 6,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () =>
-                      _pointsController.changePointsState(widget.player, -5),
-                  onLongPress: () => startSum(-10),
-                  onLongPressUp: () => stopSum(),
-                  child: Text(
-                    "-",
-                    style: TextStyle(
-                        color: kPlayersColors[widget.player], fontSize: 70),
+        GetX<PointsController>(builder: (context) {
+          _playerColor =
+              kPlayersColors[_pointsController.newPlayers[player].profileColor];
+          return Row(
+            children: [
+              SizedBox(
+                width: maxWidth / 6,
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () =>
+                        _pointsController.changePointsState(player, -5),
+                    onLongPress: () => startSum(-10),
+                    onLongPressUp: () => stopSum(),
+                    child: Text(
+                      "-",
+                      style: TextStyle(color: _playerColor, fontSize: 70),
+                    ),
                   ),
                 ),
               ),
-            ),
-            GetX<PointsController>(builder: (context) {
-              return Expanded(
+              Expanded(
                 child: Stack(
                   alignment: AlignmentDirectional.topCenter,
                   children: [
                     Center(
                       child: FittedBox(
                         child: AnimatedFlipCounter(
-                          value: _pointsController.newPlayers[widget.player].points,
+                          value: _pointsController.newPlayers[player].points,
                           textStyle: TextStyle(
                             fontSize: 100,
-                            color: kPlayersColors[widget.player],
+                            color: _playerColor,
                           ),
                         ),
                       ),
                     ),
                   ],
                 ),
-              );
-            }),
-            SizedBox(
-              width: widget.maxWidth / 6,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 40.0),
-                child: Center(
-                  child: GestureDetector(
-                    onTap: () =>
-                        _pointsController.changePointsState(widget.player, 5),
-                    onLongPress: () => startSum(10),
-                    onLongPressUp: () => stopSum(),
-                    child: FittedBox(
-                      child: Text(
-                        "+",
-                        style: TextStyle(
-                            color: kPlayersColors[widget.player], fontSize: 60),
+              ),
+              SizedBox(
+                width: maxWidth / 6,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 40.0),
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () =>
+                          _pointsController.changePointsState(player, 5),
+                      onLongPress: () => startSum(10),
+                      onLongPressUp: () => stopSum(),
+                      child: FittedBox(
+                        child: Text(
+                          "+",
+                          style: TextStyle(color: _playerColor, fontSize: 60),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            )
-          ],
-        ),
+              )
+            ],
+          );
+        }),
         buildPhase(),
         GetX<PointsController>(builder: (_) {
           return Positioned(
             bottom: 0,
             child: GestureDetector(
-              onLongPress: () {
-                _changeName(context);
+              onTap: () {
+                _changeNameAlert(context);
               },
-              child: Text(
-                _pointsController.newPlayers[widget.player].name.toUpperCase(),
-                style: TextStyle(
-                    color: kPlayersColors[widget.player],
-                    fontSize: 20,
-                    overflow: TextOverflow.ellipsis),
+              child: Row(
+                children: [
+                  Text(
+                    _pointsController.newPlayers[player].name.toUpperCase(),
+                    style: TextStyle(
+                        color: _playerColor,
+                        fontSize: 20,
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _changeColorAlert(context);
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 10),
+                      height: 18,
+                      width: 18,
+                      decoration: BoxDecoration(
+                          color: _playerColor, shape: BoxShape.circle),
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -144,45 +152,45 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         return Row(
           children: [
             GestureDetector(
-              onTap: () => _pointsController.changePhase(widget.player, -1),
+              onTap: () => _pointsController.changePhase(player, -1),
               child: Text(
                 "-  ",
-                style: TextStyle(
-                    color: kPlayersColors[widget.player], fontSize: 25),
+                style: TextStyle(color: _playerColor, fontSize: 25),
               ),
             ),
-            _pointsController.newPlayers[widget.player].isClosingPhase10
+            _pointsController.newPlayers[player].isClosingPhase10
                 ? GestureDetector(
-              onTap: ()=> _pointsController.setIsGameEnded(true),
-                  child: Text("CERRAR", style:TextStyle(
-                  color: kPlayersColors[widget.player], fontSize: 17),),
-                )
+                    onTap: () => _pointsController.setIsGameEnded(true),
+                    child: Text(
+                      "CERRAR",
+                      style: TextStyle(color: _playerColor, fontSize: 17),
+                    ),
+                  )
                 : Row(
                     children: [
                       Text(
                         "Phase: ",
-                        style: TextStyle(
-                            color: kPlayersColors[widget.player], fontSize: 17),
+                        style: TextStyle(color: _playerColor, fontSize: 17),
                       ),
                       AnimatedFlipCounter(
-                        value: _pointsController.newPlayers[widget.player].phase,
+                        value: _pointsController.newPlayers[player].phase,
                         prefix:
-                            _pointsController.newPlayers[widget.player].phase.toInt() < 10
+                            _pointsController.newPlayers[player].phase.toInt() <
+                                    10
                                 ? "0"
                                 : null,
                         textStyle: TextStyle(
                           fontSize: 20,
-                          color: kPlayersColors[widget.player],
+                          color: _playerColor,
                         ),
                       ),
                     ],
                   ),
             GestureDetector(
-              onTap: () => _pointsController.changePhase(widget.player, 1),
+              onTap: () => _pointsController.changePhase(player, 1),
               child: Text(
                 "  +",
-                style: TextStyle(
-                    color: kPlayersColors[widget.player], fontSize: 25),
+                style: TextStyle(color: _playerColor, fontSize: 25),
               ),
             ),
           ],
@@ -191,7 +199,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     );
   }
 
-  Future<void> _changeName(BuildContext context) async {
+  Future<void> _changeNameAlert(BuildContext context) async {
     return showDialog(
       context: context,
       builder: (context) {
@@ -204,7 +212,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   for (var text in _playersNameController.lastUsers.value)
                     GestureDetector(
                       onTap: () async {
-                        _pointsController.setName(widget.player, text);
+                        _pointsController.setName(player, text);
                         Get.back();
                       },
                       child: Column(
@@ -222,7 +230,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 ],
               ),
               GetX<SpeechController>(builder: (context) {
-                _nameController.text = _pointsController.newPlayers[widget.player].name;
+                _nameController.text =
+                    _pointsController.newPlayers[player].name;
                 return TextField(
                   style: const TextStyle(fontSize: 23),
                   autofocus: true,
@@ -231,7 +240,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     if (_nameController.text != "" &&
                         !_nameController.text.contains("JUGADOR")) {
                       _pointsController.setName(
-                          widget.player, _nameController.text.trim());
+                          player, _nameController.text.trim());
                       if (!_playersNameController
                           .contains(_nameController.text.trim())) {
                         _playersNameController
@@ -243,8 +252,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                     suffixIcon: GestureDetector(
                       onTap: () => _speechController.isListening()
                           ? _speechController.stopListening
-                          : _speechController.startListening(
-                              player: widget.player),
+                          : _speechController.startListening(player: player),
                       child: Icon(_speechController.isListening()
                           ? Icons.mic
                           : Icons.mic_off),
@@ -258,5 +266,78 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         );
       },
     );
+  }
+
+  Future<void> _changeColorAlert(BuildContext context) async {
+    double insetPadding = (MediaQuery.of(context).size.width - 265) / 2;
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          insetPadding: EdgeInsets.all(insetPadding),
+          content: Wrap(
+              runAlignment: WrapAlignment.center,
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 5,
+              runSpacing: 5,
+              children: _colorSelector(player)),
+        );
+      },
+    );
+  }
+
+  List<Widget> _colorSelector(player) {
+    List<Widget> list = [];
+    int len = kPlayersColors.length;
+    for (int colorIndex = 0; colorIndex < len; colorIndex++) {
+      Color singleColor = kPlayersColors[colorIndex];
+      list.add(
+        GestureDetector(
+          onTap: () => _changeColor(colorIndex),
+          child: SizedBox(
+            height: 50,
+            width: 50,
+            child: Stack(
+              alignment: AlignmentDirectional.center,
+              children: [
+                if (_pointsController.colorInUse(colorIndex) != -1)
+                  Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey, width: 3),
+                        color: Colors.white,
+                        shape: BoxShape.circle),
+                  ),
+                if (_playerColor == singleColor)
+                  Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: singleColor, width: 5),
+                        color: Colors.white,
+                        shape: BoxShape.circle),
+                  ),
+                Container(
+                  height: 38,
+                  width: 38,
+                  decoration:
+                      BoxDecoration(color: singleColor, shape: BoxShape.circle),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    list.removeAt(0);
+    return list;
+  }
+
+  _changeColor(int selectedColorIndex) {
+    _pointsController.changePlayersColor(player, selectedColorIndex);
+    _playerColor = kPlayersColors[selectedColorIndex];
+    Get.back();
   }
 }

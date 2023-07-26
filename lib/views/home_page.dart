@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:phase_10_points/controllers/speech_controller.dart';
-import 'package:phase_10_points/controllers/text_to_speech_controller.dart';
+import 'package:phase_10_points/services/speech_service.dart';
+import 'package:phase_10_points/services/text_to_speech_service.dart';
 import 'package:phase_10_points/views/instructions.dart';
 import 'package:phase_10_points/views/view_layout.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/foundation.dart';
 
-import '../controllers/players_name_controller.dart';
+import '../controllers/last_players_name_controller.dart';
 import '../controllers/points_controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,7 +24,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   final PointsController _pointsController = Get.find();
-  final TextToSpeechController _textToSpeechController = TextToSpeechController();
+  final TextToSpeechService _textToSpeechController = TextToSpeechService();
 
   bool _visible = true;
 

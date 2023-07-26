@@ -1,9 +1,9 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:phase_10_points/controllers/text_to_speech_controller.dart';
+import 'package:phase_10_points/services/text_to_speech_service.dart';
 
-import '../controllers/audio_controller.dart';
+import '../services/audio_service.dart';
 import '../controllers/points_controller.dart';
 
 class Leaderboard extends StatefulWidget {
@@ -21,8 +21,8 @@ class Leaderboard extends StatefulWidget {
 class _LeaderboardState extends State<Leaderboard> {
 
   final PointsController _pointsController = Get.find();
-  final AudioController _audioController = AudioController();
-  final TextToSpeechController _textToSpeechController = TextToSpeechController();
+  final AudioService _audioController = AudioService();
+  final TextToSpeechService _textToSpeechController = TextToSpeechService();
 
   int _players = 0;
   List<int> _points = [];

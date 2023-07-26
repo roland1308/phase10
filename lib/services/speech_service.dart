@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:phase_10_points/controllers/audio_controller.dart';
+import 'package:phase_10_points/services/audio_service.dart';
 import 'package:phase_10_points/controllers/points_controller.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -9,7 +9,7 @@ class SpeechController extends GetxController {
 
   final PointsController _pointsController = Get.find();
 
-  final AudioController _audioController = AudioController();
+  final AudioService _audioController = AudioService();
 
   String _lastWords = '';
   int _players = 0;
@@ -68,6 +68,7 @@ class SpeechController extends GetxController {
   /// the platform returns recognized words.
   void _onSpeechResult(SpeechRecognitionResult result) {
     _speechToText.refresh();
+    _userToMark = "";
 
     _lastWords = result.recognizedWords;
     bool hasFound = false;
@@ -81,8 +82,7 @@ class SpeechController extends GetxController {
     }
 
     if (_userToMark != "") {
-      int userIndex =
-          _pointsController.allNames.indexOf(_userToMark);
+      int userIndex = _pointsController.allNames.indexOf(_userToMark);
       if (_isPhase) {
         _pointsController.changePhase(userIndex, 1);
         hasFound = true;
@@ -108,7 +108,8 @@ class SpeechController extends GetxController {
 
   void _getNames() {
     _players = _pointsController.players.roundToDouble().toInt();
-    _namesInGame = _pointsController.allNames.getRange(1, _players + 1).toList();
+    _namesInGame =
+        _pointsController.allNames.getRange(1, _players + 1).toList();
   }
 
   int _spanishWordsToNumber(String words) {

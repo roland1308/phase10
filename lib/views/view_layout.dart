@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:phase_10_points/controllers/speech_controller.dart';
+import 'package:phase_10_points/services/speech_service.dart';
 import 'package:phase_10_points/utils/constants.dart';
 
 import '../controllers/points_controller.dart';

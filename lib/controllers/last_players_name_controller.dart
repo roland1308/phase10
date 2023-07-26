@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PlayersNameController extends GetxController {
+class LastPlayersNameController extends GetxController {
   Rx<Queue<String>> lastUsers = Queue<String>.from([]).obs;
 
   addUser(String newName) async {

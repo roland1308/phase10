@@ -1,6 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 
-class AudioController {
+class AudioService {
   final audioPlayer = AudioPlayer();
 
   Future<void> playSound(String soundPath) async {

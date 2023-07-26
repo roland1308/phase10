@@ -2,23 +2,25 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:get/get.dart';
-import 'package:phase_10_points/controllers/shared_preferences_controller.dart';
+import 'package:phase_10_points/services/shared_preferences_service.dart';
 import 'package:phase_10_points/utils/constants.dart';
 
 import '../models/player_model.dart';
 
 class PointsController extends GetxController {
-  final SharedPrefController _sharedPref = SharedPrefController();
+  final SharedPrefService _sharedPref = SharedPrefService();
 
-  List<Player> initialPlayers = List.generate(
+  final List<Player> _initialPlayers = List.generate(
     7,
     (index) => Player(
       name: "JUGADOR $index",
       points: 0,
       phase: 0,
       isClosingPhase10: false,
+      profileColor: index,
     ),
   );
+
   final RxList<Player> _newPlayers = List.generate(
     7,
     (index) => Player(
@@ -26,6 +28,7 @@ class PointsController extends GetxController {
       points: 0,
       phase: 0,
       isClosingPhase10: false,
+      profileColor: index,
     ),
   ).obs;
 
@@ -82,7 +85,7 @@ class PointsController extends GetxController {
       _selectedLayout.value = await _sharedPref.read("layout") ?? 1;
       _schema.value = SchemasEnum.values[_players.value.toInt() - 2];
 
-      _hasSaved.value = !arePlayerListsEqual(prefPlayers, initialPlayers);
+      _hasSaved.value = !arePlayerListsEqual(prefPlayers, _initialPlayers);
       if (_hasSaved.value ?? false) {
         _newPlayers.value = prefPlayers;
       }
@@ -94,7 +97,7 @@ class PointsController extends GetxController {
     resetPartial();
     _newPlayers[player].points += x;
     if (_newPlayers[player].points < 0) {
-      _newPlayers[player].points += 0;
+      _newPlayers[player].points = 0;
     } else {
       _showingPartial.value = true;
       updatePartial(x);
@@ -170,10 +173,11 @@ class PointsController extends GetxController {
         points: 0,
         phase: 0,
         isClosingPhase10: false,
+        profileColor: index,
       ),
     );
     _sharedPref.save("savedGame", true);
-    _sharedPref.save("newplayers", initialPlayers);
+    _sharedPref.save("newplayers", _initialPlayers);
     _newPlayers.refresh();
   }
 
@@ -182,5 +186,21 @@ class PointsController extends GetxController {
       return true;
     }
     return false;
+  }
+
+  void changePlayersColor(int player, int selectedColorIndex) {
+    int playerOwner = colorInUse(selectedColorIndex);
+    if (playerOwner != -1) {
+      _newPlayers[playerOwner].profileColor = _newPlayers[player].profileColor;
+    }
+    _newPlayers[player].profileColor = selectedColorIndex;
+    _sharedPref.save("newplayers", _newPlayers);
+    _newPlayers.refresh();
+  }
+
+  int colorInUse(int colorToCheck) {
+    List<int> tempList = List.from(_newPlayers.map((player) => player.profileColor));
+    List<int> filteredList = tempList.sublist(0, _players.value.toInt()+1);
+    return filteredList.indexOf(colorToCheck);
   }
 }

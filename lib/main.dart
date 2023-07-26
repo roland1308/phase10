@@ -4,9 +4,9 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:phase_10_points/views/home_page.dart';
 
-import 'controllers/players_name_controller.dart';
+import 'controllers/last_players_name_controller.dart';
 import 'controllers/points_controller.dart';
-import 'controllers/speech_controller.dart';
+import 'services/speech_service.dart';
 
 void main() {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     precacheImage(const AssetImage("assets/phase_10.png"), context);
     Get.put(PointsController());
-    Get.put(PlayersNameController());
+    Get.put(LastPlayersNameController());
     Get.put(SpeechController());
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
