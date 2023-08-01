@@ -13,7 +13,7 @@ import 'package:phase_10_points/views/6_up_layouts/six_up_layout_2.dart';
 
 const List<Color> kPlayersColors = [
   Colors.white,
-  Colors.red,
+  Colors.pink,
   Colors.blue,
   Colors.green,
   Color.fromRGBO(168, 102, 0, 1.0),
