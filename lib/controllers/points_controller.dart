@@ -15,22 +15,13 @@ class PointsController extends GetxController {
     (index) => Player(
       name: "JUGADOR $index",
       points: 0,
-      phase: 0,
+      phase: 1,
       isClosingPhase10: false,
       profileColor: index,
     ),
   );
 
-  final RxList<Player> _newPlayers = List.generate(
-    7,
-    (index) => Player(
-      name: "JUGADOR $index",
-      points: 0,
-      phase: 0,
-      isClosingPhase10: false,
-      profileColor: index,
-    ),
-  ).obs;
+  final RxList<Player> _newPlayers = <Player>[].obs;
 
   final RxDouble _players = 2.0.obs;
   final RxInt _selectedLayout = 1.obs;
@@ -63,6 +54,7 @@ class PointsController extends GetxController {
 
   @override
   void onInit() {
+    _newPlayers.value = List<Player>.from(_initialPlayers).obs;
     checkSaved();
     super.onInit();
   }
@@ -166,16 +158,7 @@ class PointsController extends GetxController {
   }
 
   void reset() {
-    _newPlayers.value = List.generate(
-      7,
-      (index) => Player(
-        name: "JUGADOR $index",
-        points: 0,
-        phase: 0,
-        isClosingPhase10: false,
-        profileColor: index,
-      ),
-    );
+    _newPlayers.value = List<Player>.from(_initialPlayers).obs;
     _sharedPref.save("savedGame", true);
     _sharedPref.save("newplayers", _initialPlayers);
     _newPlayers.refresh();
