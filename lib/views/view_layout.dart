@@ -22,6 +22,7 @@ class _ViewLayoutState extends State<ViewLayout> {
 
   @override
   Widget build(BuildContext context) {
+    bool hasNotch = MediaQuery.of(context).viewPadding.top == 0;
     return GestureDetector(
       onVerticalDragUpdate: (details) {
         if (details.delta.dy > 0) {
@@ -35,7 +36,7 @@ class _ViewLayoutState extends State<ViewLayout> {
           return Scaffold(
             resizeToAvoidBottomInset: false,
             floatingActionButton: _speechController.speechEnabled
-                ? FloatingActionButton(
+                ? FloatingActionButton.small(
                     onPressed: ()=>
                         _speechController.isListening()
                             ? _speechController.stopListening
@@ -51,7 +52,9 @@ class _ViewLayoutState extends State<ViewLayout> {
                 return Stack(
                   alignment: AlignmentDirectional.center,
                   children: [
-                    widget.schema.layoutWidgets[widget.layout],
+                    SafeArea(
+                        top: !hasNotch,
+                        child: widget.schema.layoutWidgets[widget.layout]),
                     if (_pointsController.showingPartial)
                       Positioned(
                         top: 10,
